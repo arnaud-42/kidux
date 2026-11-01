@@ -1,3 +1,12 @@
+kidux-session (0.5.21) trixie; urgency=medium
+
+  * A screen still left alone after its screen has turned off asks the
+    daemon to put the computer to sleep, as the adult chose on the panel's
+    Sleep and lid page; the lid is the daemon's to set, and logind waits
+    for a child's session to lock before the computer sleeps.
+
+ -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100
+
 kidux-session (0.5.20) trixie; urgency=medium
 
   * The sign-in screen, the lock screen and a child's session start their

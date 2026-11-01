@@ -1,5 +1,7 @@
 """A screen left alone: what kidux-idle decides (D67)."""
 
+import pytest
+
 from kidux import idle
 
 
@@ -36,6 +38,25 @@ def test_swayidle_arms_what_has_a_time():
         "swayidle", "-w",
         "timeout", "600", f"{program} screen off", "resume", f"{program} screen on",
     ]
+
+
+def test_a_screen_still_left_alone_asks_the_daemon_to_sleep():
+    program = "/usr/lib/kidux/kidux-idle"
+
+    assert idle.swayidle_argv(300, 600, program, 1200)[-3:] == [
+        "timeout", "1200", f"{program} sleep"]
+    assert f"{program} sleep" not in idle.swayidle_argv(300, 600, program, 0)
+
+
+@pytest.mark.parametrize("config, seconds", [
+    ({}, 1200),
+    ({"idle_action": "sleep", "idle_sleep_minutes": 45, "can_sleep": True}, 2700),
+    ({"idle_action": "sleep_then_hibernate", "idle_sleep_minutes": 20}, 1200),
+    ({"idle_action": "screen_off_only", "idle_sleep_minutes": 20}, 0),
+    ({"idle_action": "sleep", "can_sleep": False}, 0),
+])
+def test_the_seconds_before_sleeping_from_the_daemon_s_config(config, seconds):
+    assert idle.sleep_seconds(config) == seconds
 
 
 def test_seconds_from_the_environment():

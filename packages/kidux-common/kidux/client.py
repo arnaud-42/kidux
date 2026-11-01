@@ -358,6 +358,13 @@ class Client:
     def reboot(self) -> None:
         self.call("System1", "Reboot")
 
+    def sleep_when_idle(self) -> str:
+        """A screen left alone the minutes an adult chose: the computer
+        sleeps, or sleeps and then turns off saving, unless the adult chose
+        the screen off only or something holds idleness off (D119). What
+        the daemon did, "" for nothing."""
+        return self.call("System1", "SleepWhenIdle").unpack()[0]
+
     def check_updates(self, token: str) -> None:
         """Start looking for updates; UpdateState says when it is done."""
         self.call("System1", "CheckUpdates", GLib.Variant("(s)", (token,)))

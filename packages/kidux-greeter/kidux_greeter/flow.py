@@ -11,6 +11,7 @@ forward. A child is never left looking at something with no button that does
 anything.
 """
 
+from kidux import idle as kidux_idle
 from kidux import vocabulary
 
 from .daemon import DaemonError, DaemonUnavailableError, NoTimeLeft
@@ -188,6 +189,8 @@ class SignIn:
             # A session left alone locks, and its screen turns off (D67).
             "KIDUX_IDLE_LOCK_SECONDS": str(int(self._config.get("idle_lock_minutes", 5)) * 60),
             "KIDUX_SCREEN_OFF_SECONDS": str(int(self._config.get("screen_off_minutes", 10)) * 60),
+            # Still left alone, the computer sleeps, as the adult chose (D119).
+            "KIDUX_IDLE_SLEEP_SECONDS": str(kidux_idle.sleep_seconds(self._config)),
         }
         keyboard = self._child.get("keyboard") or self._config.get("default_keyboard")
         if keyboard:

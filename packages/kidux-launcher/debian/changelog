@@ -1,3 +1,9 @@
+kidux-launcher (0.3.25) trixie; urgency=medium
+
+  * The lid's notes say that the computer may now sleep when it closes.
+
+ -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100
+
 kidux-launcher (0.3.24) trixie; urgency=medium
 
   * A module ended by Close it anyway is killed five seconds after it is

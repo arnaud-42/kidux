@@ -32,18 +32,33 @@ def step(own_vt: int | None, active_vt: int | None, running: bool, gap: float) -
     return None
 
 
-def swayidle_argv(lock_seconds: int, off_seconds: int, program: str) -> list[str]:
+def swayidle_argv(lock_seconds: int, off_seconds: int, program: str,
+                  sleep_seconds: int = 0) -> list[str]:
     """`swayidle`'s command line: after `lock_seconds` without a touch the
     session locks, after `off_seconds` the screen turns off and the first
-    touch turns it on; a time of 0 is not armed. `program` is kidux-idle's
-    own path, which the timeouts run."""
+    touch turns it on, and after `sleep_seconds` the daemon is asked to put
+    the computer to sleep (D119); a time of 0 is not armed. `program` is
+    kidux-idle's own path, which the timeouts run."""
     argv = ["swayidle", "-w"]
     if lock_seconds > 0:
         argv += ["timeout", str(lock_seconds), f"{program} lock"]
     if off_seconds > 0:
         argv += ["timeout", str(off_seconds), f"{program} screen off",
                  "resume", f"{program} screen on"]
+    if sleep_seconds > 0:
+        argv += ["timeout", str(sleep_seconds), f"{program} sleep"]
     return argv
+
+
+def sleep_seconds(config: dict) -> int:
+    """The seconds a screen is left alone before the daemon is asked to put
+    the computer to sleep, from the daemon's `GetConfig`: none when the
+    adult chose the screen off only, or the computer cannot sleep."""
+    if config.get("idle_action", "sleep_then_hibernate") == "screen_off_only":
+        return 0
+    if not config.get("can_sleep", True):
+        return 0
+    return int(config.get("idle_sleep_minutes", 20)) * 60
 
 
 def seconds(environ, name: str, default: int) -> int:

@@ -212,7 +212,9 @@ def test_the_right_password_with_time_starts_the_session_with_the_childs_environ
                            "XKB_DEFAULT_LAYOUT": "es", "KIDUX_DISPLAY_SCALE": "2.0",
                            "KIDUX_AVATAR": "fox",
                            # a session left alone locks, and its screen turns off (D67)
-                           "KIDUX_IDLE_LOCK_SECONDS": "300", "KIDUX_SCREEN_OFF_SECONDS": "600"}
+                           "KIDUX_IDLE_LOCK_SECONDS": "300", "KIDUX_SCREEN_OFF_SECONDS": "600",
+                           # and, still left alone, the computer sleeps (D119)
+                           "KIDUX_IDLE_SLEEP_SECONDS": "1200"}
 
 
 
@@ -224,6 +226,17 @@ def test_a_session_gets_the_minutes_as_they_are_when_it_starts(signin, greetd, d
 
     _, _, environment = greetd.calls[-1]
     assert environment["KIDUX_IDLE_LOCK_SECONDS"] == "60"
+
+
+def test_a_session_on_a_computer_set_to_the_screen_off_only_never_asks_to_sleep(
+        signin, greetd, daemon):
+    signin.tap_child("ana")
+    daemon.settings.update(idle_action="screen_off_only")
+
+    signin.submit_password("ana-pw")
+
+    _, _, environment = greetd.calls[-1]
+    assert environment["KIDUX_IDLE_SLEEP_SECONDS"] == "0"
 
 
 def test_a_child_with_windows_has_a_session_that_knows(signin, greetd, daemon):
