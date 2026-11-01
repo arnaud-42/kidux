@@ -6,16 +6,25 @@ because a record kept by anything a child's session runs can be killed or
 edited by the child.
 """
 
+import os
+from signal import SIGHUP
 from dataclasses import dataclass
 from typing import Protocol
 
 from gi.repository import Gio, GLib
 
+from kidux.log import get_logger
+
 from .errors import Failed
+
+_log = get_logger("logind")
 
 LOGIND = "org.freedesktop.login1"
 MANAGER_PATH = "/org/freedesktop/login1"
 MANAGER = "org.freedesktop.login1.Manager"
+SYSTEMD = "org.freedesktop.systemd1"
+SYSTEMD_PATH = "/org/freedesktop/systemd1"
+SYSTEMD_MANAGER = "org.freedesktop.systemd1.Manager"
 
 
 @dataclass(frozen=True)
@@ -36,6 +45,11 @@ class Logind(Protocol):
     def terminate_user(self, uid: int) -> None: ...
     def power_off(self) -> None: ...
     def reboot(self) -> None: ...
+    def can(self, what: str) -> str: ...
+    def block_inhibited(self) -> str: ...
+    def sleep(self, method: str) -> None: ...
+    def systemd_version(self) -> str: ...
+    def reload(self) -> None: ...
 
 
 class SystemLogind:
@@ -83,6 +97,109 @@ class SystemLogind:
     def reboot(self) -> None:
         self._call("Reboot", GLib.Variant("(b)", (False,)))
 
+    def can(self, what: str) -> str:
+        """logind's answer to `Can<what>`, "Suspend" or "Hibernate": "yes",
+        "no", "na" or "challenge"; "na" when it cannot be asked."""
+        try:
+            return str(self._call(f"Can{what}", None, "(s)").unpack()[0])
+        except Failed:
+            return "na"
+
+    def block_inhibited(self) -> str:
+        """What the block inhibitors hold off now, "idle:sleep"."""
+        try:
+            reply = self._connection.call_sync(
+                LOGIND, MANAGER_PATH, "org.freedesktop.DBus.Properties", "Get",
+                GLib.Variant("(ss)", (MANAGER, "BlockInhibited")),
+                GLib.VariantType("(v)"), Gio.DBusCallFlags.NONE, 10_000, None)
+        except GLib.Error as error:
+            raise Failed(f"logind BlockInhibited failed: {error.message}") from error
+        return str(reply.unpack()[0])
+
+    def sleep(self, method: str) -> None:
+        """`Suspend` or `SuspendThenHibernate`, not interactive."""
+        self._call(method, GLib.Variant("(b)", (False,)))
+
+    def systemd_version(self) -> str:
+        """The service manager's version, "257.13-1~deb13u1"; "" when it
+        cannot be asked."""
+        try:
+            reply = self._connection.call_sync(
+                SYSTEMD, SYSTEMD_PATH, "org.freedesktop.DBus.Properties", "Get",
+                GLib.Variant("(ss)", (SYSTEMD_MANAGER, "Version")),
+                GLib.VariantType("(v)"), Gio.DBusCallFlags.NONE, 10_000, None)
+        except GLib.Error:
+            return ""
+        return str(reply.unpack()[0])
+
+    def reload(self) -> None:
+        """logind reads its configuration again: SIGHUP to its main process,
+        as `systemctl kill -s HUP systemd-logind` sends it. Never a restart,
+        which would end every session on the machine."""
+        try:
+            self._connection.call_sync(
+                SYSTEMD, SYSTEMD_PATH, SYSTEMD_MANAGER, "KillUnit",
+                GLib.Variant("(ssi)", ("systemd-logind.service", "main", SIGHUP)),
+                None, Gio.DBusCallFlags.NONE, 10_000, None)
+        except GLib.Error as error:
+            raise Failed(f"logind could not be reloaded: {error.message}") from error
+
+
+class SleepGuard:
+    """Locks a child's session before the computer sleeps, whatever put it
+    to sleep: the lid, a computer left alone, a key (D119).
+
+    logind is asked for a delay lock on sleep, which holds a sleep back
+    until it is let go, for at most `InhibitDelayMaxSec` (kidux-session's
+    logind.conf). When logind announces a sleep, `on_sleep` runs, and locks
+    every unlocked session, and the lock is let go; when the computer wakes,
+    a new one is taken for the next sleep.
+    """
+
+    WHO = "Kidux"
+    WHY = "A child's session locks before the computer sleeps."
+
+    def __init__(self, connection: Gio.DBusConnection, on_sleep) -> None:
+        self._connection = connection
+        self._on_sleep = on_sleep
+        self._fd: int | None = None
+
+    def start(self) -> None:
+        self._connection.signal_subscribe(
+            LOGIND, MANAGER, "PrepareForSleep", MANAGER_PATH, None,
+            Gio.DBusSignalFlags.NONE, self._prepare)
+        self._take()
+
+    def _take(self) -> None:
+        if self._fd is not None:
+            return
+        try:
+            reply, fds = self._connection.call_with_unix_fd_list_sync(
+                LOGIND, MANAGER_PATH, MANAGER, "Inhibit",
+                GLib.Variant("(ssss)", ("sleep", self.WHO, self.WHY, "delay")),
+                GLib.VariantType("(h)"), Gio.DBusCallFlags.NONE, 10_000, None, None)
+        except GLib.Error as error:
+            _log.warning("no delay lock on sleep: %s", error.message)
+            return
+        self._fd = fds.get(reply.unpack()[0])
+
+    def _let_go(self) -> None:
+        if self._fd is not None:
+            os.close(self._fd)
+            self._fd = None
+
+    def _prepare(self, connection, sender, path, interface, signal_name, parameters) -> None:
+        (going,) = parameters.unpack()
+        if not going:
+            self._take()
+            return
+        try:
+            self._on_sleep()
+        except Exception:
+            _log.exception("could not lock before the computer sleeps")
+        finally:
+            self._let_go()
+
 
 class FakeLogind:
     def __init__(self) -> None:
@@ -90,6 +207,13 @@ class FakeLogind:
         self.terminated: list[int] = []
         self.powered_off = False
         self.rebooted = False
+        #: logind's answers to Can*, as root would get them.
+        self.answers = {"CanSuspend": "yes", "CanHibernate": "yes",
+                        "CanSuspendThenHibernate": "yes"}
+        self.blocked = ""
+        self.slept: list[str] = []
+        self.version = "257.13-1~deb13u1"
+        self.reloads = 0
 
     def sessions(self) -> list[SessionInfo]:
         return list(self.open)
@@ -103,6 +227,21 @@ class FakeLogind:
 
     def reboot(self) -> None:
         self.rebooted = True
+
+    def can(self, what: str) -> str:
+        return self.answers.get(f"Can{what}", "na")
+
+    def block_inhibited(self) -> str:
+        return self.blocked
+
+    def sleep(self, method: str) -> None:
+        self.slept.append(method)
+
+    def systemd_version(self) -> str:
+        return self.version
+
+    def reload(self) -> None:
+        self.reloads += 1
 
 
 def has_session(logind: Logind, uid: int) -> bool:
