@@ -25,6 +25,8 @@ instead, in English and Spanish.
 - [session.md](session.md): `kidux-session`: how the machine boots into the
   sign-in screen, the child's session, the lock screen's terminal, and every
   door that is closed.
+- [power.md](power.md): sleep and the lid, what a computer can do, the
+  files logind and systemd-sleep read, and how to try it by hand.
 - [keys.md](keys.md): the keys a child's session binds, why a MacBook's and a
   PC's are the same, and how a keyboard that sends something else is added.
 - [greeter.md](greeter.md): `kidux-greeter`, the sign-in screen and the lock

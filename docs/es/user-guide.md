@@ -523,10 +523,12 @@ dicen, dentro de cualquier módulo. La esquina de la pantalla del niño
 muestra el nuevo nivel al momento.
 
 Cerrar la tapa bloquea la sesión del niño y apaga la pantalla y la luz
-del teclado. Al abrir la tapa se encienden de nuevo, con la luz tan
-fuerte como estaba, en la pantalla de bloqueo, donde el niño escribe su
-contraseña para seguir. El tiempo no cuenta mientras la tapa está
-cerrada.
+del teclado; después el ordenador se duerme, y al minuto se apaga
+guardando, como dice la página **Dormir y tapa** del panel de adulto
+(sección 8). Al abrir la tapa se despierta y la pantalla se enciende de
+nuevo, con la luz tan fuerte como estaba, en la pantalla de bloqueo,
+donde el niño escribe su contraseña para seguir. El tiempo no cuenta
+mientras la tapa está cerrada.
 
 Las mismas teclas funcionan en la pantalla de inicio y en la de bloqueo,
 y cerrar la tapa allí también apaga la pantalla y la luz del teclado.
@@ -860,6 +862,56 @@ salvo que sepas qué opción necesita tu ordenador: vacío es lo que Kidux
 hace por su cuenta.
 
 ![Avanzado: el puntero y las opciones de Chromium](../images/es/panel-system-advanced.png)
+
+### Dormir y tapa
+
+**Dormir y tapa**, junto a **Avanzado** al final de la página Sistema, es
+para lo que hace el ordenador al cerrar la tapa, y cuando nadie lo usa
+durante un buen rato. Conoce dos formas de descansar:
+
+- **Dormir**: el ordenador para casi todo, y despierta al momento, donde
+  estaba, al abrir la tapa o pulsar una tecla. Sigue gastando algo de
+  batería.
+- **Apagar guardando**: el ordenador escribe en su disco todo lo que tiene
+  abierto y se apaga. No gasta batería, y al encenderlo de nuevo vuelve a
+  empezar donde estaba, algo más despacio que al despertar.
+
+**Al cerrar la tapa** puede ser:
+
+- **Dormir y, al minuto, apagar guardando**, que es lo que hace Kidux
+  mientras no elijas otra cosa: cerrada un momento, el ordenador despierta
+  al momento; cerrada más rato, está apagado y no gasta nada.
+- **Dormir**.
+- **Nada**: la tapa solo bloquea la sesión y apaga la pantalla.
+
+Hace lo mismo con batería que enchufado. Con otra pantalla conectada,
+cerrar la tapa solo apaga la pantalla del portátil, y el ordenador sigue
+despierto. La elección se guarda, y se aplica, en cuanto se hace.
+
+**Si sigue sin usarse** es lo que pasa cuando nadie toca el ordenador
+durante unos minutos, veinte para empezar, después de que se apague la
+pantalla (la fila **Si se deja solo** de la página Sistema): **Dormir y,
+al minuto, apagar guardando**, **Dormir** o **Solo apagar la pantalla**.
+Elige una y los minutos, y pulsa **Fijar**. Las pantallas de inicio y de
+bloqueo lo toman la próxima vez que empiezan, la sesión de un niño la
+próxima vez que el niño entra. No pasa nada mientras se reproduce un vídeo
+o un programa pide que el ordenador siga despierto. Cada pantalla cuenta
+sus propios minutos: la sesión de un niño que se deja sola se bloquea
+primero, y la pantalla de bloqueo cuenta entonces desde el principio.
+
+Antes de que el ordenador se duerma, por lo que sea, la sesión de un niño
+se bloquea, así que el tiempo de un niño nunca se gasta mientras el
+ordenador duerme.
+
+Apagar guardando necesita un ordenador que pueda hacerlo: un espacio de
+intercambio (swap) en su disco con sitio para lo que el ordenador tiene en
+memoria, y Secure Boot desactivado en los ajustes del firmware del
+ordenador, porque con Secure Boot activado Linux no deja guardar la
+memoria en el disco. El instalador de Kidux crea un fichero de
+intercambio del tamaño de la memoria, hasta 4 GB; un ordenador con más
+memoria en uso que eso no puede apagar guardando. Cuando este ordenador no puede, la página
+solo ofrece **Dormir**, y dice por qué en una línea. Una elección hecha
+antes se conserva, y se hace como **Dormir**.
 
 ### Red
 
@@ -1373,6 +1425,30 @@ hacer una reparación:
 4. Pulsa F10.
 
 Las consolas vuelven solo para ese arranque.
+
+### El ordenador no se duerme, o no se apaga guardando
+
+Un administrador con una consola de texto (arriba), o por SSH, puede ver
+qué puede hacer el ordenador y qué hizo:
+
+```sh
+busctl call org.freedesktop.login1 /org/freedesktop/login1 \
+    org.freedesktop.login1.Manager CanSuspendThenHibernate
+cat /sys/kernel/security/lockdown     # todo lo que no sea [none] es Secure Boot
+swapon --show                         # un swap en el disco, no zram
+systemd-analyze cat-config systemd/logind.conf | grep -i lid
+cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
+systemd-inhibit --list                # qué lo mantiene despierto
+journalctl -b -1 | grep -i -e hibernat -e suspend
+```
+
+`yes` en la primera quiere decir que puede dormir y después apagar
+guardando. El ajuste de la tapa está en
+`/etc/systemd/logind.conf.d/50-kidux-power.conf`, que escribe el panel;
+un fichero allí o en `/usr/lib/systemd/logind.conf.d/` cuyo nombre vaya
+detrás en orden alfabético y fije `HandleLidSwitch` manda sobre él, y hay
+que quitarlo. `sudo systemctl hibernate` prueba a apagar guardando al
+momento.
 
 ### Quitar Kidux de un ordenador
 

@@ -79,7 +79,7 @@ is `PAM`, a C binding with a conversation callback, not the pure-Python `pam`.
 |---|---|
 | `org.kidux.daemon.manage` | Changing configuration: `Parental1.*`, `Daemon1.SetConfig`, `Children1.Create/Delete/SetProfile/SetChildPassword`, `Access1.SetPolicy/Grant/SetTimeLeft`, `Modules1.SetEnabled/Settings/SetSetting`, `System1.CheckUpdates/ApplyUpdates`. |
 | `org.kidux.daemon.screens` | What the trusted screens need: `Children1.List`, `Access1.GetPolicy/CheckAccess/AuthoriseSession/GrantExtraTime/UnlockForSaving/ContinueSession/EndSession`, `Daemon1.GetConfig`. |
-| `org.kidux.daemon.self` | What a child needs: `Access1.Usage`, `Access1.Lock`, `Access1.LockFor`, `Modules1.List`, `Modules1.MySettings`. |
+| `org.kidux.daemon.self` | What a child needs: `Access1.Usage`, `Access1.Lock`, `Access1.LockFor`, `Modules1.List`, `Modules1.MySettings`, `System1.SleepWhenIdle`. |
 
 The rules, in `/usr/share/polkit-1/rules.d/50-kidux.rules`:
 
@@ -607,7 +607,8 @@ The daemon never starts a module: the launcher does, as the child
 Per tracked session: `unlocked → locking → locked → unlocking → unlocked`, and
 `ending` from any of them.
 
-**Lock**, with a reason (`time_up`, `requested`, `power_button`, `grace`):
+**Lock**, with a reason (`time_up`, `requested`, `power_button`, `grace`,
+`idle`, `lid`, or `sleep`, before the computer sleeps: power.md section 5):
 
 1. `systemd1.Manager.StartUnit("kidux-locker@<username>.service", "replace")`,
    then wait until logind shows a session for `_greetd` of class `greeter` on
@@ -748,6 +749,16 @@ enabling both units. It does not touch `/home/.kidux`.
 `Reboot(false)`. No polkit, no password: a child may always turn the computer
 off, and it is the daemon calling logind, not the child, so logind's own
 `power-off-multiple-sessions` policy does not get in the way.
+
+`SleepWhenIdle() → s`, the `self` class, is what `kidux-idle` asks when a
+screen is still left alone `idle_sleep_minutes`: logind's `Suspend(false)`
+or `SuspendThenHibernate(false)`, as `idle_action` says and the computer
+can, and nothing for the screen off only or while logind's
+`BlockInhibited` holds `idle` or `sleep`; it answers what it did, "" for
+nothing, and audits a sleep (power.md section 4). At every start the
+daemon writes logind's and systemd-sleep's power drop-ins and holds a
+delay lock on sleep, which locks every child's session before the
+computer sleeps (power.md sections 3 and 5).
 
 `Versions() → a{sv}`, the `screens` class: every Kidux package dpkg has
 installed, `kidux-*` and `python3-kidux`, and its version, from `dpkg-query
@@ -917,7 +928,9 @@ names `kidux-daemon.service` as `SystemdService`.
 - `Daemon1.GetConfig() → a{sv}`: `default_language`, `default_keyboard`,
   `display_scale`, `reset_hour`, `setup_complete`, `language_chosen`,
   `chromium_flags`, `pointer_speed`, `scroll_speed`, `idle_lock_minutes`,
-  `screen_off_minutes`, `save_minutes`, `apt_statistics`. The
+  `screen_off_minutes`, `save_minutes`, `apt_statistics`, `lid_action`,
+  `idle_action`, `idle_sleep_minutes`, and what the computer can do,
+  `can_sleep`, `can_hibernate` and `hibernate_reason` (power.md). The
   trusted screens run as `_greetd`, which cannot read `config.toml`, and they
   need the scale and the language before they draw anything. `screens` class.
 - `Daemon1.SetConfig(token, changes a{sv})`, `manage` class: any of
@@ -929,6 +942,10 @@ names `kidux-daemon.service` as `SystemdService`.
   minutes a session may be left alone before it locks and before the screen
   turns off (D67), `save_minutes` (1 to 15), how long *Unlock to save*
   gives, which no page offers and the session tests set, and
+  `lid_action` (`sleep_then_hibernate`, `sleep` or `nothing`), written for
+  logind at once, `idle_action` (`sleep_then_hibernate`, `sleep` or
+  `screen_off_only`) and `idle_sleep_minutes` (1 to 240), the power
+  settings (power.md, D119),
   `apt_statistics` (a boolean), whether every fetch of the archive carries
   an identifier of this machine's, `apt_statistics_id`, made once and kept:
   `/etc/apt/apt.conf.d/61kidux-statistics` written or removed at once

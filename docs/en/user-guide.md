@@ -508,8 +508,10 @@ the sound (louder, quieter and mute) do what they say, inside any module.
 The corner of the child's screen shows the new level at once.
 
 Closing the lid locks the child's session and turns the screen and the
-keyboard's light off. Opening the lid turns them back on, with the light
-as bright as it was, on the lock screen, where the child types their
+keyboard's light off; then the computer sleeps, and a minute later turns
+off saving, as the adult panel's **Sleep and lid** page says (section 8).
+Opening the lid wakes it and turns the screen back on, with the light as
+bright as it was, on the lock screen, where the child types their
 password to carry on. Time does not count while the lid is closed.
 
 The same keys work on the sign-in screen and on the lock screen, and
@@ -828,6 +830,54 @@ them into the box. Leave the box empty unless you know which option your
 computer needs: empty is what Kidux does on its own.
 
 ![Advanced: the pointer and Chromium's options](../images/en/panel-system-advanced.png)
+
+### Sleep and lid
+
+**Sleep and lid**, beside **Advanced** at the end of the System page, is
+for what the computer does when its lid closes, and when nobody uses it
+for a long while. It knows two ways to rest:
+
+- **Sleep**: the computer stops almost everything, and wakes at once,
+  where it was, when the lid opens or a key is pressed. It still uses a
+  little battery.
+- **Turn off saving**: the computer writes everything it has open to its
+  disk and turns off. It uses no battery, and when it is turned on again
+  it starts where it was, more slowly than from sleep.
+
+**When the lid closes** can be:
+
+- **Sleep, and after a minute turn off saving**, which is what Kidux does
+  until you choose: closed for a moment, the computer wakes at once;
+  closed for longer, it is off and uses nothing.
+- **Sleep**.
+- **Nothing**: the lid only locks the session and turns the screen off.
+
+It does the same on the battery and plugged in. With another screen
+connected, closing the lid only turns the laptop's own screen off, and the
+computer stays awake. The choice is saved, and applies, as soon as it is
+made.
+
+**If still left alone** is what happens when nobody touches the computer
+for some minutes, twenty to start with, after its screen has turned off
+(the **Left alone** row of the System page): **Sleep, and after a minute
+turn off saving**, **Sleep**, or **Only turn the screen off**. Choose one
+and the minutes, then press **Set**. The sign-in and lock screens take it
+the next time they start, a child's session the next time the child signs
+in. Nothing happens while a video plays or a program asks the computer to
+stay awake. Each screen counts its own minutes: a child's session left
+alone locks first, and the lock screen then counts from the start.
+
+Before the computer sleeps, for any reason, a child's session locks, so
+that the time a child has is never spent while the computer sleeps.
+
+Turning off saving needs a computer that can do it: a swap space on its
+disk with room for what the computer holds in memory, and Secure Boot off
+in the computer's firmware settings, since with Secure Boot on Linux does
+not let a computer save its memory to disk. Kidux's installer makes a swap
+file the size of the memory, up to 4 GB; a computer with more memory
+in use than that cannot turn off saving. When this
+computer cannot, the page offers only **Sleep**, and says why on one line.
+A choice made before then is kept, and done as **Sleep**.
 
 ### Network
 
@@ -1328,6 +1378,28 @@ computer is a door. To get one back for a repair:
 4. Press F10.
 
 The text logins come back for that start only.
+
+### The computer does not sleep, or does not turn off saving
+
+An administrator with a text login (above), or over SSH, can see what the
+computer can do and what it did:
+
+```sh
+busctl call org.freedesktop.login1 /org/freedesktop/login1 \
+    org.freedesktop.login1.Manager CanSuspendThenHibernate
+cat /sys/kernel/security/lockdown     # anything but [none] is Secure Boot's
+swapon --show                         # a swap space on the disk, not zram
+systemd-analyze cat-config systemd/logind.conf | grep -i lid
+cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
+systemd-inhibit --list                # what is keeping it awake
+journalctl -b -1 | grep -i -e hibernat -e suspend
+```
+
+`yes` to the first means it can sleep and then turn off saving. The lid's
+setting is in `/etc/systemd/logind.conf.d/50-kidux-power.conf`, which the
+panel writes; a file there or in `/usr/lib/systemd/logind.conf.d/` whose
+name sorts after it, setting `HandleLidSwitch`, wins over it, and should be
+removed. `sudo systemctl hibernate` tries turning off saving at once.
 
 ### Taking Kidux off a computer
 

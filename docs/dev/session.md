@@ -370,7 +370,9 @@ given: a child's session gets `KIDUX_IDLE_LOCK_SECONDS` and
 `idle_lock_minutes` (five until an adult chooses) and `screen_off_minutes`
 (ten), which the panel's System page sets; a trusted screen gets the
 screen's minutes from `greeter-session` and no lock, having no session to
-lock. After the first, `kidux-idle lock` asks the daemon to lock the child's
+lock; and, for every screen, `KIDUX_IDLE_SLEEP_SECONDS`, the machine's
+`idle_sleep_minutes` (twenty), or 0 when the adult chose the screen off
+only (D119, power.md section 4). After the first, `kidux-idle lock` asks the daemon to lock the child's
 session, `Access1.LockFor("idle")`, as the child: the same lock as the Lock
 button, so the counter stops (D13). After the second, `kidux-idle screen
 off` turns every output off through the compositor, `wlopm` under `labwc`,
@@ -378,7 +380,10 @@ which has output power management, and `wlr-randr --off` under `cage`,
 which has not, and the keyboard's light after them; the first touch runs
 `kidux-idle screen on`, which gives the light back first, as it was. The
 screen's brightness is left alone, so a desktop's screen turns off as a
-laptop's does.
+laptop's does. After the third, `kidux-idle sleep` asks the daemon,
+`System1.SleepWhenIdle`, to put the computer to sleep, or to sleep and then
+turn off saving, as the adult chose and the computer can, unless an idle
+inhibitor is held (power.md section 4).
 
 `kidux-idle` counts only while its screen's terminal is the one in front:
 it reads its own from `XDG_VTNR`, which greetd and the lock screen's unit
@@ -392,7 +397,7 @@ screen, and a timer that ran out while it was frozen never fires as it
 thaws; the daemon refuses a lock for idleness in the ten seconds after a
 session is given the screen back, in case one does. Its log is the
 journal's `kidux-idle`: `swayidle started (tty7, lock 300 s, screen off
-600 s)`, `swayidle stopped: tty8 is in front`, `screen off (tty8)`,
+600 s, sleep 1200 s)`, `swayidle stopped: tty8 is in front`, `screen off (tty8)`,
 `screen on (tty8)`, `lock: asked (tty7)`.
 
 The screen's brightness and the keyboard's light are the laptop keys' and
@@ -430,8 +435,9 @@ nothing). The rule applies to a device as udev sees it, so
 devices: an upgrade takes effect without a restart. The keyboard's light
 goes off after the panel and comes back before it, as above; the screen's
 brightness is untouched; with the lid closed, `kidux-idle screen on`
-leaves the laptop's own panel and the light off; and logind keeps
-ignoring the lid (section 6).
+leaves the laptop's own panel and the light off. Whether the computer
+then sleeps is logind's, as the adult set it (power.md section 3); before
+it sleeps the daemon locks the session, if the launcher has not already.
 
 On the trusted screens, under `cage`, no launcher watches the lid:
 `session-inner` starts `/usr/lib/kidux/kidux-lid-watch` beside the sign-in
@@ -459,7 +465,8 @@ and the machine is a Debian machine again. Nothing here is done by a
 | SysRq | `sysctl.d`: `kernel.sysrq = 0` | Alt+SysRq+B reboots without asking anything; Alt+SysRq+K kills the session. |
 | Outliving the session | `logind.conf.d`: `KillUserProcesses=yes` (trixie default `no`) | A script started before logging out keeps running, and keeps counting for nothing — or keeps a listening socket open for the next session. |
 | Watching other processes | `sysctl.d`: `kernel.yama.ptrace_scope = 2` (trixie default `0`) | One of the child's processes attaches to another — the launcher, a module — and reads or drives it. Phase 6 gives children arbitrary code on purpose. |
-| Power key | `logind.conf.d`: `HandlePowerKey=ignore`, `HandleLidSwitch=ignore` | logind powers off or suspends before the daemon can put the trusted screen up (`daemon.md` section 11). |
+| Power key | `logind.conf.d`: `HandlePowerKey=ignore`, `HandlePowerKeyLongPress=ignore` | logind powers off before the daemon can put the trusted screen up (`daemon.md` section 11). |
+| Sleeping out of a time limit | `logind.conf.d`: `InhibitDelayMaxSec=15`, for the daemon's delay lock on sleep, which locks a child's session before the computer sleeps for any reason; the lid itself is the daemon's drop-in in `/etc`, as the adult sets it (power.md) | A child closes the lid, or presses a sleep key, and the session sleeps unlocked, counting nothing and open again at once on waking. |
 | Switching back from the lock screen | `40-kidux-children.rules`: `org.freedesktop.login1.chvt` → `NO` for `kidux-children` | trixie's default lets an inactive session switch VTs; a child's frozen session, once thawed for a moment, could switch itself back. `/dev/tty*` is already root-only, so this is the only path, and it is closed. |
 | Ctrl+Alt+F*n* inside a child's session | The same `chvt` rule: `labwc` has these keys built in, and asks logind, which refuses the child | Leaving the session for a text login, or for terminal 8 while the lock screen is down. |
 | A terminal, a menu, a key that runs a program | labwc's configuration binds Super, Alt+Tab and Alt+F4 (Alt+Tab, Alt+F4, and Super on the desk, signal the launcher) and the laptop's keys for its screen, keyboard light and sound, which run `kidux-keys` as the child, a program that only sets those three levels (D61), and nothing else, loads none of labwc's own keys or mouse bindings, shows no menu, and is root's, read from a directory the child cannot write (`-C`); its `rc.xml` with the pointer's part (section 3) is written afresh at every start in a new directory of the session's, so nothing the child leaves there is ever read at a start, and labwc reads it again only on a signal, which takes a program of the child's that can already run whatever a key could; `kidux-session` conflicts with `foot`, `wmenu` and every `x-terminal-emulator` | The shell a desktop hands anyone who presses the right keys. |
