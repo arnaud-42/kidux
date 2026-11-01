@@ -1,4 +1,5 @@
-"""The power button and Ctrl+Alt+Escape: the keys that always reach a trusted screen.
+"""The power button and Ctrl+Alt+Escape: the keys that always reach a trusted
+screen; and the lid closing, which suspends the computer (D119).
 
 daemon.md section 11, D16. An adult presses the power button *before* typing
 the adult password, and whatever screen appears is real, because the daemon
@@ -6,8 +7,10 @@ reads the key straight from the input device and nothing a child runs can
 stop it. The devices are read, never grabbed: the compositor still gets
 every key.
 
-`Chords` is the pure part: it is fed key events and says when one of the
-keys has been pressed. `InputWatcher` opens the real devices with
+`Chords` is the pure part: it is fed key and switch events and says when
+one of the keys has been pressed, or the lid closed: a close, never the
+lid's state, so that a lid switch that reads closed with the lid open, as
+a MacBook's can after a failed resume, suspends nothing. `InputWatcher` opens the real devices with
 python3-evdev and feeds it from the GLib main loop.
 """
 
@@ -21,6 +24,8 @@ _log = get_logger("attention")
 # Linux input event codes (linux/input-event-codes.h). Plain numbers so the
 # pure part can be tested without evdev installed.
 EV_KEY = 1
+EV_SW = 5
+SW_LID = 0
 KEY_ESC = 1
 KEY_LEFTCTRL = 29
 KEY_LEFTALT = 56
@@ -62,13 +67,19 @@ class Chords:
         elif code == KEY_ESC and held & CTRL and held & ALT:
             self._on_attention("ctrl_alt_escape")
 
+    def switch(self, code: int, value: int) -> None:
+        """A switch event: the lid closing, value 1, is "lid_closed"."""
+        if code == SW_LID and value == 1:
+            self._on_attention("lid_closed")
+
     def forget(self, device: str) -> None:
         self._held.pop(device, None)
 
 
-def wanted(capabilities: set[int]) -> bool:
-    """A device worth reading: one with a power key, or a keyboard with the chord."""
-    if KEY_POWER in capabilities:
+def wanted(capabilities: set[int], switches: set[int] = frozenset()) -> bool:
+    """A device worth reading: one with a power key, a keyboard with the
+    chord, or the lid's switch."""
+    if KEY_POWER in capabilities or SW_LID in switches:
         return True
     return KEY_ESC in capabilities and bool(capabilities & CTRL) and bool(capabilities & ALT)
 
@@ -111,8 +122,9 @@ class InputWatcher:
             from gi.repository import GLib
 
             device = evdev.InputDevice(path)
-            keys = set(device.capabilities().get(EV_KEY, []))
-            if not wanted(keys):
+            capabilities = device.capabilities()
+            keys = set(capabilities.get(EV_KEY, []))
+            if not wanted(keys, set(capabilities.get(EV_SW, []))):
                 device.close()
                 return
             source = GLib.io_add_watch(
@@ -152,6 +164,8 @@ class InputWatcher:
             for event in device.read():
                 if event.type == EV_KEY:
                     self._chords.feed(path, event.code, event.value)
+                elif event.type == EV_SW:
+                    self._chords.switch(event.code, event.value)
         except BlockingIOError:
             pass
         except OSError:

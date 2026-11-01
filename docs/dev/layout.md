@@ -108,8 +108,8 @@ starts it through systemd, and its status file is
 /usr/lib/systemd/system/kidux-locker@.service       the lock screen, per child
 /usr/lib/systemd/system/getty@.service.d/kidux.conf no text logins
 /usr/lib/systemd/logind.conf.d/kidux.conf           no spare terminals, no power
-                                                    key, kill on logout, the
-                                                    delay before a sleep
+                                                    key, no lid, kill on logout,
+                                                    the delay before a sleep
 /usr/lib/systemd/sleep.conf.d/kidux.conf            no hibernation
 /usr/lib/sysctl.d/60-kidux.conf                     no SysRq, no ptrace
 /etc/ssh/sshd_config.d/kidux.conf                   no SSH for children
@@ -127,7 +127,6 @@ starts it through systemd, and its status file is
 /etc/apt/sources.list.d/kidux.sources               the archive
 /etc/apt/apt.conf.d/60kidux-user-agent              every fetch says it is a Kidux machine's
 /etc/apt/apt.conf.d/61kidux-statistics              and which one, while an adult shares statistics
-/etc/systemd/logind.conf.d/50-kidux-power.conf      what the lid does, as the panel says (the daemon's)
 /usr/share/keyrings/kidux-archive-keyring.pgp       its key
 ```
 

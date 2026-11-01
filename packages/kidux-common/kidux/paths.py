@@ -123,12 +123,6 @@ INPUT_XML = Path(os.environ.get("KIDUX_INPUT_XML", "/etc/kidux/input.xml"))
 APT_STATISTICS = Path(os.environ.get("KIDUX_APT_STATISTICS",
                                      "/etc/apt/apt.conf.d/61kidux-statistics"))
 
-#: What logind does when the lid closes, from the panel's *Suspending the computer* page
-#: (kiduxd.power, D119): the daemon writes it, root's and 0644, and has
-#: logind read it again.
-LOGIND_POWER = Path(os.environ.get("KIDUX_LOGIND_POWER",
-                                   "/etc/systemd/logind.conf.d/50-kidux-power.conf"))
-
 # --- identities --------------------------------------------------------------
 
 #: Adults. Members may call every method on the daemon. Deliberately not a

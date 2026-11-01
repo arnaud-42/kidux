@@ -25,7 +25,8 @@ default.
 
 `Daemon1.GetConfig` returns the three with `can_sleep`, whether the
 computer can suspend; `Daemon1.SetConfig` takes the three (daemon.md
-section 15).
+section 15), each in effect at once for the lid, at a screen's next start
+for idleness.
 
 ## 2. What the computer can do
 
@@ -46,36 +47,30 @@ initramfs.
 
 ## 3. The lid
 
-logind handles the lid, from a drop-in the daemon writes, root's and 0644,
-`/etc/systemd/logind.conf.d/50-kidux-power.conf` (`paths.LOGIND_POWER`):
+logind ignores the lid, as `kidux-session`'s `logind.conf.d/kidux.conf`
+says (`HandleLidSwitch`, `HandleLidSwitchExternalPower` and
+`HandleLidSwitchDocked` all `ignore`): logind acts on the switch's state,
+and a switch can read closed with the lid open, as a MacBook's did after a
+failed resume, which made logind suspend at every start and the computer
+never come back.
 
-```ini
-[Login]
-HandleLidSwitch=suspend
-HandleLidSwitchExternalPower=suspend
-HandleLidSwitchDocked=ignore
-```
+The daemon suspends for the lid instead, on the lid's **close**, an event:
+`attention.py` reads the lid switch's device with the power button's, and
+a close (`EV_SW`, `SW_LID`, value 1) is `Service.lid_closed`. It does
+nothing when the lid's action comes to `nothing`, or while another screen
+is connected (`power.docked`: a connected DRM connector in
+`/sys/class/drm` that is not the laptop's own eDP, LVDS or DSI panel). It
+locks every unlocked child's session with reason `lid`, then asks the
+switch again (`power.lid_is_closed`): opened in the meantime, nothing
+happens; still closed, it calls logind's `Suspend(false)`, audited as
+`suspend for the lid`. The same on battery and on mains power.
 
-`suspend` or `ignore`, for the lid action the computer can do, the same on
-battery and on mains power; nothing while the laptop is docked or another
-screen is connected, logind's own test of docked. The daemon writes it at
-every start, so that an upgraded machine gets it and a computer that has
-gained or lost the means to suspend does what it now can, and when
-`lid_action` is set; when the text changed, it has logind read its
-configuration again with SIGHUP to its main process
-(`org.freedesktop.systemd1.Manager.KillUnit`, as `systemctl kill -s HUP
-systemd-logind`), never a restart, which would end every session.
-`kidux-session`'s own `logind.conf.d/kidux.conf` sets nothing about the
-lid: it is in `/usr/lib`, named after `50-…`, and would win.
-
-Nothing else on a Kidux screen handles the lid. labwc has no lid handling
+Nothing else on a Kidux screen suspends for the lid. labwc has no lid handling
 of its own; the launcher (launcher.md section 5) and `kidux-lid-watch`
 (session.md section 5) read the switch, lock the session and power the
-laptop's own panel off, and take no `handle-lid-switch` inhibitor, so
-logind acts on the lid as it is set. With the lid set to `nothing`, or
-docked, what they do is all that happens. `LidSwitchIgnoreInhibited`
-stays logind's default, yes: a video playing does not keep a closed laptop
-awake.
+laptop's own panel off. With the lid set to `nothing`, or docked, what
+they do is all that happens. No inhibitor holds the lid's suspend off: a
+video playing does not keep a closed laptop awake.
 
 ## 4. A computer left alone
 
@@ -147,5 +142,5 @@ On a Kidux laptop, as its administrator over SSH:
 6. `busctl call org.freedesktop.login1 /org/freedesktop/login1
    org.freedesktop.login1.Manager CanHibernate` as root answers `no`, and
    `sudo systemctl hibernate` is refused.
-7. `systemd-analyze cat-config systemd/logind.conf` shows the drop-in last
-   for the lid; `systemd-inhibit --list` shows Kidux's delay lock.
+7. `systemd-inhibit --list` shows Kidux's delay lock, and the journal's
+   `kidux-daemon` says `suspend for the lid`, or why not.

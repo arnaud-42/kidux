@@ -26,7 +26,7 @@ from .access import (
     validate_policy, weekday_of,
 )
 from .adults import AdultPassword
-from .advanced import check_flags, write_file, write_flags, write_input
+from .advanced import check_flags, write_flags, write_input
 from . import power, statistics
 from .children import Children
 from .config import Config
@@ -135,6 +135,10 @@ class Service:
         #: How a child is signed in to a module's website: one HTTPS request,
         #: replaced in the tests by a fake website.
         self.sign_in_request = signin.request_in_unit
+        #: The lid's switch and the screens connected, read from the machine;
+        #: replaced in the tests.
+        self.lid_is_closed = power.lid_is_closed
+        self.connected_screens = power.connected_screens
         if check_child_password is None:
             from .pamcheck import check_password as check_child_password
         self._check_child_password = check_child_password
@@ -283,8 +287,6 @@ class Service:
             write_input(config.pointer_speed, config.scroll_speed)
         if "apt_statistics" in changes:
             statistics.apply(config)
-        if "lid_action" in changes:
-            self.apply_power(config)
         self._audit("config set", "ok", caller=self._who(caller), fields=sorted(changes))
 
     # --- Parental1 -----------------------------------------------------------
@@ -646,7 +648,11 @@ class Service:
         return self.timekeeper.tick()
 
     def attention(self, source: str) -> None:
-        """The power button or Ctrl+Alt+Escape (D16)."""
+        """The power button or Ctrl+Alt+Escape (D16), or the lid closing
+        (D119)."""
+        if source == "lid_closed":
+            self.lid_closed()
+            return
         for tracked in self.timekeeper.sessions.values():
             if not tracked.locked:
                 self._lock(tracked, "power_button")
@@ -927,20 +933,29 @@ class Service:
         """Whether this computer can suspend, as logind says now."""
         return power.can_sleep(self.logind.can("Suspend"))
 
-    def apply_power(self, config: Config | None = None) -> None:
-        """logind's file as the lid's setting says, for what this computer
-        can do; logind reads it again when it changed."""
-        config = config or Config.load()
-        lid = power.lid_action(config.lid_action, self.can_sleep())
-        text = power.logind_conf(lid)
-        try:
-            written = paths.LOGIND_POWER.read_text()
-        except OSError:
-            written = ""
-        if written != text:
-            write_file(paths.LOGIND_POWER, text)
-            self.logind.reload()
-            _log.info("the lid: %s (chosen %s)", lid, config.lid_action)
+    def lid_closed(self) -> None:
+        """The lid was seen to close (attention.py): the computer suspends,
+        as the adult chose and it can, unless another screen is connected.
+        A child's session locks first, and the lid is asked again after:
+        opened in the meantime, nothing happens."""
+        config = Config.load()
+        if power.lid_action(config.lid_action, self.can_sleep()) != "sleep":
+            return
+        if power.docked(self.connected_screens()):
+            _log.info("the lid closed with another screen connected: not suspending")
+            return
+        for tracked in list(self.timekeeper.sessions.values()):
+            if not tracked.locked:
+                try:
+                    self._lock(tracked, "lid")
+                except Failed:
+                    _log.exception("could not lock %s for the lid", tracked.username)
+        if not self.lid_is_closed():
+            _log.info("the lid opened again before suspending: not suspending")
+            return
+        _log.info("the lid closed: suspending")
+        self._audit("suspend for the lid", "ok")
+        self.logind.suspend()
 
     def System1_SleepWhenIdle(self, caller: Caller) -> str:
         """A screen left alone `idle_sleep_minutes` asks this (kidux-idle):

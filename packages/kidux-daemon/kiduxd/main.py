@@ -77,15 +77,6 @@ def serve(
         except Exception:
             logger.exception("could not apply the usage statistics setting")
 
-    # logind's lid file as config.toml has it (power.py, D119): on every
-    # start, so that a machine upgraded from before the setting existed gets
-    # it with its default, and a computer that has since gained or lost the
-    # means to suspend does what it now can.
-    try:
-        service.apply_power()
-    except Exception:
-        logger.exception("could not apply the power settings")
-
     bus_object.register()
 
     # --- the clock: one timer, re-armed after every tick for as long as the

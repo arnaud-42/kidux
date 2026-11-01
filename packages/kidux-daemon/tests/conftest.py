@@ -40,7 +40,6 @@ def roots(tmp_path, monkeypatch):
     monkeypatch.setenv("KIDUX_CHROMIUM_FLAGS", str(tmp_path / "etc" / "chromium-flags"))
     monkeypatch.setenv("KIDUX_INPUT_XML", str(tmp_path / "etc" / "input.xml"))
     monkeypatch.setenv("KIDUX_APT_STATISTICS", str(tmp_path / "etc" / "61kidux-statistics"))
-    monkeypatch.setenv("KIDUX_LOGIND_POWER", str(tmp_path / "etc" / "logind-power.conf"))
     importlib.reload(paths)
     yield state_root
     monkeypatch.undo()

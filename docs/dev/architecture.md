@@ -2079,12 +2079,14 @@ Taken while planning `phase-3-plan.md`, which explains each in its section 3.
   (twenty) after its last touch suspends too, as the second stage after
   D67's screen off, unless an idle inhibitor is held. The adult chooses
   each on the panel's *Suspending the computer* page: suspend or nothing
-  for the lid, suspend or the screen off only for idleness. logind
-  handles the lid from a drop-in the daemon writes, reloaded by SIGHUP,
-  so kidux-session's drop-in no longer has it ignore the lid; what kept a
-  closed lid from being a way out of a time limit is now the daemon's
-  delay inhibitor on sleep, which locks every child's session before any
-  sleep, whatever caused it. The second stage goes through the daemon
+  for the lid, suspend or the screen off only for idleness. logind keeps
+  ignoring the lid: the daemon suspends on the lid's close, an event it
+  reads with the power button's, after locking a child's session and only
+  if the switch still reads closed, since the same MacBook's switch read
+  closed with the lid open after a failed resume, and logind, which acts
+  on the state, suspended at every start. A delay inhibitor on sleep locks
+  every child's session before any sleep, whatever caused it, so a closed
+  lid is never a way out of a time limit. The second stage goes through the daemon
   (`System1.SleepWhenIdle`), not logind's `IdleAction`, which needs an
   `IdleHint` from every session, and not the screens themselves, which
   polkit does not let suspend.

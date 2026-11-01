@@ -703,7 +703,8 @@ was frozen, firing as it thaws. The reason is in the audit line and in the
 ## 11. Secure attention
 
 `attention.py` opens every `/dev/input/event*` device whose capabilities
-include `KEY_POWER`, or the keyboard set `KEY_LEFTCTRL`, `KEY_LEFTALT` and
+include `KEY_POWER`, the lid's switch (`SW_LID`, whose close suspends the
+computer: power.md section 3), or the keyboard set `KEY_LEFTCTRL`, `KEY_LEFTALT` and
 `KEY_ESC`, with `python3-evdev`, read through a GLib IO watch. The devices are
 **not** grabbed: the compositor still gets every key. `/dev/input` is watched
 with `Gio.File.monitor_directory` so a keyboard plugged in later is picked up.
@@ -764,8 +765,10 @@ screen is still left alone `idle_sleep_minutes`: logind's `Suspend(false)`,
 as `idle_action` says and the computer can, and nothing for the screen
 off only or while logind's `BlockInhibited` holds `idle` or `sleep`; it
 answers what it did, "sleep" or "" for nothing, and audits a suspend
-(power.md section 4). At every start the daemon writes logind's lid
-drop-in and holds a delay lock on sleep, which locks every child's session before the
+(power.md section 4). The lid's close, read with the power button
+(section 11), suspends the computer as `lid_action` says, after locking
+a child's session and when the lid still reads closed; and the daemon
+holds a delay lock on sleep, which locks every child's session before the
 computer sleeps (power.md sections 3 and 5).
 
 `Versions() → a{sv}`, the `screens` class: every Kidux package dpkg has
@@ -950,7 +953,7 @@ names `kidux-daemon.service` as `SystemdService`.
   minutes a session may be left alone before it locks and before the screen
   turns off (D67), `save_minutes` (1 to 15), how long *Unlock to save*
   gives, which no page offers and the session tests set, and
-  `lid_action` (`sleep` or `nothing`), written for logind at once,
+  `lid_action` (`sleep` or `nothing`),
   `idle_action` (`sleep` or `screen_off_only`) and `idle_sleep_minutes`
   (1 to 240), the power settings (power.md, D119),
   `apt_statistics` (a boolean), whether every fetch of the archive carries

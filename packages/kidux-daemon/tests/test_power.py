@@ -34,14 +34,25 @@ def test_a_computer_left_alone_does_what_was_chosen_or_what_it_can(chosen, sleep
     assert power.idle_action(chosen, sleeps) == done
 
 
-@pytest.mark.parametrize("action, handle", [("sleep", "suspend"), ("nothing", "ignore")])
-def test_logind_s_file_handles_the_lid_alike_on_battery_and_mains_and_never_docked(
-        action, handle):
-    text = power.logind_conf(action)
+@pytest.mark.parametrize("connectors, docked", [
+    (["card1-eDP-1"], False),
+    ([], False),
+    (["card0-LVDS-1"], False),
+    (["card1-eDP-1", "card1-HDMI-A-1"], True),
+    (["card0-DP-1"], True),
+    (["Virtual-1"], True),
+])
+def test_another_screen_connected_is_docked(connectors, docked):
+    assert power.docked(connectors) is docked
 
-    lines = [line for line in text.splitlines() if line and not line.startswith("#")]
-    assert lines == ["[Login]", f"HandleLidSwitch={handle}",
-                     f"HandleLidSwitchExternalPower={handle}", "HandleLidSwitchDocked=ignore"]
+
+def test_the_screens_connected_from_the_kernel(tmp_path):
+    for name, status in (("card1-eDP-1", "connected"), ("card1-HDMI-A-1", "disconnected"),
+                         ("card0-DP-1", "connected")):
+        (tmp_path / name).mkdir()
+        (tmp_path / name / "status").write_text(status + "\n")
+
+    assert power.connected_screens(tmp_path) == ["card0-DP-1", "card1-eDP-1"]
 
 
 @pytest.mark.parametrize("blocked, idle", [

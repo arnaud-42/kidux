@@ -1125,37 +1125,59 @@ def test_the_power_settings_are_saved(machine):
         ("nothing", "screen_off_only", 45)
 
 
-def test_the_lid_s_setting_is_written_for_logind_which_reads_it_again(machine):
+def test_a_lid_closing_suspends_the_computer(machine):
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: ["card1-eDP-1"]
+
+    machine.service.attention("lid_closed")
+
+    assert machine.logind.slept == ["Suspend"]
+
+
+def test_a_lid_set_to_nothing_does_not_suspend(machine):
     token = machine.unlock(GREETER)
-
     machine.call(GREETER, "Daemon1", "SetConfig", token, {"lid_action": "nothing"})
+    machine.service.lid_is_closed = lambda: True
 
-    assert "HandleLidSwitch=ignore\n" in paths.LOGIND_POWER.read_text()
-    assert machine.logind.reloads == 1
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == []
 
 
-def test_logind_is_left_alone_when_its_file_does_not_change(machine):
-    machine.service.apply_power()
-    machine.service.apply_power()
+def test_a_lid_opened_again_before_suspending_does_not_suspend(machine):
+    machine.service.lid_is_closed = lambda: False
 
-    assert "HandleLidSwitch=suspend\n" in paths.LOGIND_POWER.read_text()
-    assert machine.logind.reloads == 1
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == []
+
+
+def test_a_lid_closed_with_another_screen_connected_does_not_suspend(machine):
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: ["card1-eDP-1", "card1-HDMI-A-1"]
+
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == []
 
 
 def test_a_hibernating_lid_kept_from_a_development_build_suspends(machine):
     state.write(paths.CONFIG_FILE, {"lid_action": "sleep_then_hibernate"}, "config")
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: []
 
-    machine.service.apply_power()
+    machine.service.lid_closed()
 
-    assert "HandleLidSwitch=suspend\n" in paths.LOGIND_POWER.read_text()
+    assert machine.logind.slept == ["Suspend"]
 
 
 def test_a_lid_set_to_suspend_does_nothing_on_a_computer_that_cannot(machine):
     machine.logind.answers.update(CanSuspend="na")
+    machine.service.lid_is_closed = lambda: True
 
-    machine.service.apply_power()
+    machine.service.lid_closed()
 
-    assert "HandleLidSwitch=ignore\n" in paths.LOGIND_POWER.read_text()
+    assert machine.logind.slept == []
     assert Config.load().lid_action == "sleep"     # kept as chosen
 
 

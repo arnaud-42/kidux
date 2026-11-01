@@ -7,7 +7,6 @@ edited by the child.
 """
 
 import os
-from signal import SIGHUP
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -22,9 +21,6 @@ _log = get_logger("logind")
 LOGIND = "org.freedesktop.login1"
 MANAGER_PATH = "/org/freedesktop/login1"
 MANAGER = "org.freedesktop.login1.Manager"
-SYSTEMD = "org.freedesktop.systemd1"
-SYSTEMD_PATH = "/org/freedesktop/systemd1"
-SYSTEMD_MANAGER = "org.freedesktop.systemd1.Manager"
 
 
 @dataclass(frozen=True)
@@ -48,7 +44,6 @@ class Logind(Protocol):
     def can(self, what: str) -> str: ...
     def block_inhibited(self) -> str: ...
     def suspend(self) -> None: ...
-    def reload(self) -> None: ...
 
 
 class SystemLogind:
@@ -119,18 +114,6 @@ class SystemLogind:
         """`Suspend`, not interactive."""
         self._call("Suspend", GLib.Variant("(b)", (False,)))
 
-    def reload(self) -> None:
-        """logind reads its configuration again: SIGHUP to its main process,
-        as `systemctl kill -s HUP systemd-logind` sends it. Never a restart,
-        which would end every session on the machine."""
-        try:
-            self._connection.call_sync(
-                SYSTEMD, SYSTEMD_PATH, SYSTEMD_MANAGER, "KillUnit",
-                GLib.Variant("(ssi)", ("systemd-logind.service", "main", SIGHUP)),
-                None, Gio.DBusCallFlags.NONE, 10_000, None)
-        except GLib.Error as error:
-            raise Failed(f"logind could not be reloaded: {error.message}") from error
-
 
 class SleepGuard:
     """Locks a child's session before the computer sleeps, whatever put it
@@ -198,7 +181,6 @@ class FakeLogind:
         self.answers = {"CanSuspend": "yes"}
         self.blocked = ""
         self.slept: list[str] = []
-        self.reloads = 0
 
     def sessions(self) -> list[SessionInfo]:
         return list(self.open)
@@ -222,8 +204,6 @@ class FakeLogind:
     def suspend(self) -> None:
         self.slept.append("Suspend")
 
-    def reload(self) -> None:
-        self.reloads += 1
 
 
 def has_session(logind: Logind, uid: int) -> bool:

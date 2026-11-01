@@ -1,7 +1,7 @@
 kidux-common (0.1.61) trixie; urgency=medium
 
-  * The path of the lid's file for logind, and the words of the panel's
-    Suspending the computer page.
+  * The words of the panel's Suspending the computer page, and when a
+    screen left alone asks the computer to suspend.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:25:04 +0100
 

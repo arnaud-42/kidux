@@ -119,7 +119,7 @@ def daily_upgrade(machine: Machine) -> None:
 
 def suspending(machine: Machine) -> None:
     """The System page's Suspending the computer (D119): the lid's setting
-    suspends; Nothing chosen for the lid is written for logind at once."""
+    suspends; Nothing chosen for the lid is saved at once."""
     open_panel(machine)
     machine.still()
     for _ in range(5 + children_count() + 3):
@@ -134,10 +134,8 @@ def suspending(machine: Machine) -> None:
     machine.key("ret")
     shown = machine.shown("panel_power", before, 10)
     machine.screenshot("panel-system-power")
-    conf = "/etc/systemd/logind.conf.d/50-kidux-power.conf"
-    report("Suspending the computer, beside Advanced, has the lid suspend",
-           shown and "HandleLidSwitch=suspend\n" in root(f"cat {conf}").stdout,
-           greeter_log() + root(f"cat {conf}").stdout)
+    config = "/home/.kidux/config.toml"
+    report("Suspending the computer is beside Advanced", shown, greeter_log())
 
     # The lid's list has the focus: its last choice, Nothing.
     machine.key("ret")
@@ -146,10 +144,9 @@ def suspending(machine: Machine) -> None:
     before = machine.mark()
     machine.key("ret")
     machine.shown("panel_power", before, 10)
-    report("choosing Nothing for the lid has logind ignore it, at once",
-           wait(lambda: "HandleLidSwitch=ignore\n" in root(f"cat {conf}").stdout, 10)
-           and root(f"stat -c '%U %a' {conf}").stdout.strip() == "root 644",
-           root(f"cat {conf}").stdout + root(f"tail -2 {AUDIT}").stdout)
+    report("choosing Nothing for the lid saves it at once",
+           wait(lambda: 'lid_action = "nothing"' in root(f"cat {config}").stdout, 10),
+           root(f"grep lid_action {config}").stdout + root(f"tail -2 {AUDIT}").stdout)
     root("runuser -u debian -- /usr/local/bin/kidux-as set-config lid_action "
          "'\"sleep\"'")
     before = machine.mark()

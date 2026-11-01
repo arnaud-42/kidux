@@ -1059,6 +1059,18 @@ def test_a_session_already_locked_stays_as_it_is_when_the_computer_sleeps(h):
     assert ("Access1", "Locked", "(ss)", ("ana", "sleep")) not in h.signals
 
 
+def test_a_lid_closing_locks_the_session_then_suspends(h):
+    h.policy(mode="daily", daily_minutes=60)
+    h.service.session_appeared(SESSION)
+    h.service.lid_is_closed = lambda: True
+    h.service.connected_screens = lambda: []
+
+    h.service.attention("lid_closed")
+
+    assert ("Access1", "Locked", "(ss)", ("ana", "lid")) in h.signals
+    assert h.service.logind.slept == ["Suspend"]
+
+
 def test_sleeping_with_nobody_signed_in_locks_nothing(h):
     h.service.going_to_sleep()
 

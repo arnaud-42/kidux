@@ -1416,16 +1416,15 @@ qué puede hacer el ordenador y qué hizo:
 ```sh
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager CanSuspend
-systemd-analyze cat-config systemd/logind.conf | grep -i lid
 systemd-inhibit --list                # qué lo mantiene encendido
 journalctl -b | grep -i suspend
 ```
 
 `yes` o `challenge` en la primera quiere decir que puede suspenderse. El
-ajuste de la tapa está en `/etc/systemd/logind.conf.d/50-kidux-power.conf`,
-que escribe el panel; un fichero allí o en
-`/usr/lib/systemd/logind.conf.d/` cuyo nombre vaya detrás en orden
-alfabético y fije `HandleLidSwitch` manda sobre él, y hay que quitarlo.
+registro dice por qué no se suspendió al cerrar la tapa:
+`sudo journalctl -t kidux-daemon | grep -i lid`. Kidux suspende cuando ve
+cerrarse la tapa, y no mientras haya otra pantalla conectada ni si la tapa
+ya está abierta de nuevo para entonces.
 
 ### Quitar Kidux de un ordenador
 

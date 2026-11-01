@@ -2,8 +2,9 @@ kidux-daemon (0.3.39) trixie; urgency=medium
 
   * The panel's Suspending the computer settings: whether closing the lid
     suspends the computer, and whether a computer still left alone after
-    its screen has turned off suspends; logind handles the lid from a
-    file the daemon writes.
+    its screen has turned off suspends. The daemon suspends on the lid's
+    close, not on its state, once a child's session is locked and while
+    the lid is still closed and no other screen is connected.
   * A child's session locks before the computer suspends, whatever
     suspends it.
   * A session locked when the computer was turned off is not locked

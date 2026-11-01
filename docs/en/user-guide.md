@@ -1370,16 +1370,14 @@ computer can do and what it did:
 ```sh
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager CanSuspend
-systemd-analyze cat-config systemd/logind.conf | grep -i lid
 systemd-inhibit --list                # what is keeping it on
 journalctl -b | grep -i suspend
 ```
 
-`yes` or `challenge` to the first means it can suspend. The lid's
-setting is in `/etc/systemd/logind.conf.d/50-kidux-power.conf`, which the
-panel writes; a file there or in `/usr/lib/systemd/logind.conf.d/` whose
-name sorts after it, setting `HandleLidSwitch`, wins over it, and should be
-removed.
+`yes` or `challenge` to the first means it can suspend. The journal says
+why it did not for the lid: `sudo journalctl -t kidux-daemon | grep -i lid`.
+Kidux suspends when it sees the lid close, and not while another screen
+is connected or when the lid is open again by then.
 
 ### Taking Kidux off a computer
 

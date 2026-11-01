@@ -11,9 +11,10 @@ keyboard's light off after the screen, remembered where the lock screen,
 on which the lid is opened, finds it to give it back (D97). Nothing else
 changes: the screen's brightness stays what it was, windows stay where
 they are, and an external screen stays on. Whether the computer then
-suspends is logind's, as the adult set it on the panel's *Suspending
-the computer* page (power.md, D119); before it sleeps the daemon locks the session
-itself, so closing the lid is never a way out of a time limit.
+suspends is the daemon's, which sees the lid close too, as the adult set
+it on the panel's *Suspending the computer* page (power.md, D119); it
+locks the session before any suspend, so closing the lid is never a way
+out of a time limit.
 """
 
 import logging
