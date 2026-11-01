@@ -56,7 +56,14 @@ sudo rm /etc/systemd/system/kidux-lid-watch.service /usr/local/sbin/kidux-lid-wa
 ```
 
 The install guide's `server.conf` for logind and the masked sleep targets
-stay: they say what `kidux-session` says too.
+stay while the machine serves: they keep it awake with its lid closed,
+over the lid setting of the panel's *Suspend and hibernate* page
+(power.md). A machine that is only a child's removes both:
+
+```bash
+sudo rm /etc/systemd/logind.conf.d/server.conf
+sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+```
 
 ## 3. Installing
 
