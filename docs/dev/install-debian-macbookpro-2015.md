@@ -185,8 +185,9 @@ runs the children's kiosk perfectly well.
 ## 7. Laptop settings
 
 Until the kiosk exists, the lid must not suspend the machine (it would drop SSH).
-Once children use it, the kiosk's own power policy takes over: screen off on idle,
-no suspend, shutdown from the launcher.
+Once children use it, Kidux's own power policy takes over: the screen off when
+left alone, suspend on the lid's close and when left alone longer, as the adult
+sets on the panel (power.md), shutdown from the launcher.
 
 ```bash
 sudo mkdir -p /etc/systemd/logind.conf.d

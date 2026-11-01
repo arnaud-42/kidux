@@ -524,10 +524,11 @@ muestra el nuevo nivel al momento.
 
 Cerrar la tapa bloquea la sesión del niño y apaga la pantalla y la luz
 del teclado; después el ordenador se suspende, como dice la página
-**Suspensión** del panel de adulto (sección 8). Al abrir la tapa se enciende y la pantalla se enciende de
-nuevo, con la luz tan fuerte como estaba, en la pantalla de bloqueo,
-donde el niño escribe su contraseña para seguir. El tiempo no cuenta
-mientras la tapa está cerrada.
+**Suspensión** del panel de adulto (sección 8). Al abrir la tapa el
+ordenador se despierta y la pantalla se enciende de nuevo, con la luz tan
+fuerte como estaba, en la pantalla de bloqueo, donde el niño escribe su
+contraseña para seguir. El tiempo no cuenta mientras la tapa está
+cerrada.
 
 Las mismas teclas funcionan en la pantalla de inicio y en la de bloqueo,
 y cerrar la tapa allí también apaga la pantalla y la luz del teclado.
@@ -894,6 +895,8 @@ niño se bloquea, así que el tiempo de un niño nunca se gasta mientras el
 ordenador está suspendido. En un ordenador que no puede suspenderse, la
 página lo dice en un aviso, y cerrar la tapa o dejarlo sin usar solo lo
 bloquea y apaga la pantalla.
+
+![Suspensión: la tapa y la acción tras inactividad](../images/es/panel-system-power.png)
 
 ### Red
 

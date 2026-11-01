@@ -435,8 +435,9 @@ devices: an upgrade takes effect without a restart. The keyboard's light
 goes off after the panel and comes back before it, as above; the screen's
 brightness is untouched; with the lid closed, `kidux-idle screen on`
 leaves the laptop's own panel and the light off. Whether the computer
-then sleeps is logind's, as the adult set it (power.md section 3); before
-it sleeps the daemon locks the session, if the launcher has not already.
+then suspends is the daemon's, which sees the lid close too, as the adult
+set it (power.md section 3); it locks the session before the computer
+sleeps, if the launcher has not already.
 
 On the trusted screens, under `cage`, no launcher watches the lid:
 `session-inner` starts `/usr/lib/kidux/kidux-lid-watch` beside the sign-in

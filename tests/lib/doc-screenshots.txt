@@ -28,6 +28,7 @@ panel-children          panel-children.png
 panel-child             panel-child.png
 panel-system            panel-system.png
 panel-system-advanced   panel-system-advanced.png
+panel-system-power      panel-system-power.png
 panel-updates-found     panel-updates-found.png
 panel-updates-done      panel-updates-done.png
 launcher                launcher.png

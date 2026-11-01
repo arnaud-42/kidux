@@ -509,9 +509,10 @@ The corner of the child's screen shows the new level at once.
 
 Closing the lid locks the child's session and turns the screen and the
 keyboard's light off; then the computer suspends, as the adult panel's
-**Suspending the computer** page says (section 8). Opening the lid wakes it and turns the screen back on, with the light as
-bright as it was, on the lock screen, where the child types their
-password to carry on. Time does not count while the lid is closed.
+**Suspending the computer** page says (section 8). Opening the lid wakes
+it and turns the screen back on, with the light as bright as it was, on
+the lock screen, where the child types their password to carry on. Time
+does not count while the lid is closed.
 
 The same keys work on the sign-in screen and on the lock screen, and
 closing the lid there turns the screen and the keyboard's light off too.
@@ -861,6 +862,8 @@ Before the computer suspends, for any reason, a child's session locks,
 so that a child's time is never spent while the computer sleeps. On a
 computer that cannot suspend, the page says so in a warning, and closing
 the lid or leaving it idle only locks it and turns the screen off.
+
+![Suspending the computer: the lid, and the action when idle](../images/en/panel-system-power.png)
 
 ### Network
 

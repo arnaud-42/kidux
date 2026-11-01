@@ -56,9 +56,10 @@ sudo rm /etc/systemd/system/kidux-lid-watch.service /usr/local/sbin/kidux-lid-wa
 ```
 
 The install guide's `server.conf` for logind and the masked sleep targets
-stay while the machine serves: they keep it awake with its lid closed,
-over the lid setting of the panel's *Suspending the computer* page
-(power.md). A machine that is only a child's removes both:
+stay while the machine serves: with the sleep targets masked, logind
+answers no to `CanSuspend`, so the machine never suspends, whatever the
+lid is set to, and the panel's *Suspending the computer* page says so
+(power.md section 2). A machine that is only a child's removes both:
 
 ```bash
 sudo rm /etc/systemd/logind.conf.d/server.conf
