@@ -523,9 +523,9 @@ dicen, dentro de cualquier módulo. La esquina de la pantalla del niño
 muestra el nuevo nivel al momento.
 
 Cerrar la tapa bloquea la sesión del niño y apaga la pantalla y la luz
-del teclado; después el ordenador se duerme, y al minuto se apaga
-guardando, como dice la página **Dormir y tapa** del panel de adulto
-(sección 8). Al abrir la tapa se despierta y la pantalla se enciende de
+del teclado; después el ordenador se suspende, y al minuto hiberna, como
+dice la página **Suspensión e hibernación** del panel de adulto (sección
+8). Al abrir la tapa se enciende y la pantalla se enciende de
 nuevo, con la luz tan fuerte como estaba, en la pantalla de bloqueo,
 donde el niño escribe su contraseña para seguir. El tiempo no cuenta
 mientras la tapa está cerrada.
@@ -863,55 +863,52 @@ hace por su cuenta.
 
 ![Avanzado: el puntero y las opciones de Chromium](../images/es/panel-system-advanced.png)
 
-### Dormir y tapa
+### Suspensión e hibernación
 
-**Dormir y tapa**, junto a **Avanzado** al final de la página Sistema, es
-para lo que hace el ordenador al cerrar la tapa, y cuando nadie lo usa
-durante un buen rato. Conoce dos formas de descansar:
+**Suspensión e hibernación**, junto a **Avanzado** al final de la página
+Sistema, es para lo que hace el ordenador al cerrar la tapa, y cuando
+nadie lo usa durante un rato:
 
-- **Dormir**: el ordenador para casi todo, y despierta al momento, donde
-  estaba, al abrir la tapa o pulsar una tecla. Sigue gastando algo de
-  batería.
-- **Apagar guardando**: el ordenador escribe en su disco todo lo que tiene
-  abierto y se apaga. No gasta batería, y al encenderlo de nuevo vuelve a
-  empezar donde estaba, algo más despacio que al despertar.
+- **Suspensión**: gasto reducido de batería, y el ordenador se enciende
+  inmediatamente, donde estaba, al abrir la tapa o pulsar una tecla.
+- **Hibernación**: no gasta batería. El ordenador escribe en su disco
+  todo lo que tiene abierto y se apaga; al encenderlo de nuevo vuelve a
+  empezar donde estaba, algo más despacio que tras suspender. Requiere
+  espacio de intercambio (swap) en el disco (más abajo).
 
-**Al cerrar la tapa** puede ser:
+**Al cerrar la tapa** puede ser **Suspender y, al minuto, hibernar**, que
+es lo que hace Kidux mientras no elijas otra cosa: cerrada un momento, el
+ordenador se enciende al momento; cerrada más rato, está apagado y no
+gasta nada. O **Suspender**, o **Nada**: la tapa solo bloquea la sesión y
+apaga la pantalla. Hace lo mismo con batería que enchufado. Con otra
+pantalla conectada, cerrar la tapa solo apaga la pantalla del portátil,
+y el ordenador sigue encendido. La elección se aplica en cuanto se hace.
 
-- **Dormir y, al minuto, apagar guardando**, que es lo que hace Kidux
-  mientras no elijas otra cosa: cerrada un momento, el ordenador despierta
-  al momento; cerrada más rato, está apagado y no gasta nada.
-- **Dormir**.
-- **Nada**: la tapa solo bloquea la sesión y apaga la pantalla.
+**Acción tras inactividad** es lo que pasa cuando nadie toca el ordenador
+durante unos minutos, veinte para empezar: **Suspender y, al minuto,
+hibernar**, **Suspender** o **Solo apagar la pantalla**. Elige una y los
+minutos, y pulsa **Fijar**. Las pantallas de inicio y de bloqueo lo toman
+la próxima vez que empiezan, la sesión de un niño la próxima vez que el
+niño entra. La pantalla se puede apagar antes: se configura en la fila
+**Si se deja solo** de la página Sistema. No pasa nada mientras se
+reproduce un vídeo o un programa pide que el ordenador siga encendido.
+Cada pantalla cuenta sus propios minutos: la sesión de un niño que se
+deja sola se bloquea primero, y la pantalla de bloqueo cuenta entonces
+desde el principio.
 
-Hace lo mismo con batería que enchufado. Con otra pantalla conectada,
-cerrar la tapa solo apaga la pantalla del portátil, y el ordenador sigue
-despierto. La elección se guarda, y se aplica, en cuanto se hace.
+Antes de que el ordenador se suspenda, por lo que sea, la sesión de un
+niño se bloquea, así que el tiempo de un niño nunca se gasta mientras el
+ordenador está suspendido.
 
-**Si sigue sin usarse** es lo que pasa cuando nadie toca el ordenador
-durante unos minutos, veinte para empezar, después de que se apague la
-pantalla (la fila **Si se deja solo** de la página Sistema): **Dormir y,
-al minuto, apagar guardando**, **Dormir** o **Solo apagar la pantalla**.
-Elige una y los minutos, y pulsa **Fijar**. Las pantallas de inicio y de
-bloqueo lo toman la próxima vez que empiezan, la sesión de un niño la
-próxima vez que el niño entra. No pasa nada mientras se reproduce un vídeo
-o un programa pide que el ordenador siga despierto. Cada pantalla cuenta
-sus propios minutos: la sesión de un niño que se deja sola se bloquea
-primero, y la pantalla de bloqueo cuenta entonces desde el principio.
-
-Antes de que el ordenador se duerma, por lo que sea, la sesión de un niño
-se bloquea, así que el tiempo de un niño nunca se gasta mientras el
-ordenador duerme.
-
-Apagar guardando necesita un ordenador que pueda hacerlo: un espacio de
-intercambio (swap) en su disco con sitio para lo que el ordenador tiene en
-memoria, y Secure Boot desactivado en los ajustes del firmware del
-ordenador, porque con Secure Boot activado Linux no deja guardar la
-memoria en el disco. El instalador de Kidux crea un fichero de
-intercambio del tamaño de la memoria, hasta 4 GB; un ordenador con más
-memoria en uso que eso no puede apagar guardando. Cuando este ordenador no puede, la página
-solo ofrece **Dormir**, y dice por qué en una línea. Una elección hecha
-antes se conserva, y se hace como **Dormir**.
+Hibernar necesita un espacio de intercambio (swap) en el disco con sitio
+para lo que el ordenador tiene en memoria, y Secure Boot desactivado en
+los ajustes del firmware del ordenador, porque con Secure Boot activado
+Linux no deja hibernar. El instalador de Kidux crea un fichero de
+intercambio del tamaño de la memoria, hasta 4 GB. Cuando este ordenador
+no puede hibernar, la página lo dice en un aviso, y por qué; si eliges
+hibernar de todos modos, el ordenador se suspende en su lugar. Para crear
+un espacio de swap, mira **Crear un espacio de intercambio (swap)** en la
+sección 11.
 
 ### Red
 
@@ -1426,7 +1423,7 @@ hacer una reparación:
 
 Las consolas vuelven solo para ese arranque.
 
-### El ordenador no se duerme, o no se apaga guardando
+### El ordenador no se suspende o no hiberna
 
 Un administrador con una consola de texto (arriba), o por SSH, puede ver
 qué puede hacer el ordenador y qué hizo:
@@ -1435,20 +1432,77 @@ qué puede hacer el ordenador y qué hizo:
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager CanSuspendThenHibernate
 cat /sys/kernel/security/lockdown     # todo lo que no sea [none] es Secure Boot
-swapon --show                         # un swap en el disco, no zram
+cat /proc/swaps                       # un swap en el disco, no zram
 systemd-analyze cat-config systemd/logind.conf | grep -i lid
 cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
-systemd-inhibit --list                # qué lo mantiene despierto
+systemd-inhibit --list                # qué lo mantiene encendido
 journalctl -b -1 | grep -i -e hibernat -e suspend
 ```
 
-`yes` en la primera quiere decir que puede dormir y después apagar
-guardando. El ajuste de la tapa está en
+`yes` en la primera quiere decir que puede suspender y después hibernar.
+El ajuste de la tapa está en
 `/etc/systemd/logind.conf.d/50-kidux-power.conf`, que escribe el panel;
 un fichero allí o en `/usr/lib/systemd/logind.conf.d/` cuyo nombre vaya
 detrás en orden alfabético y fije `HandleLidSwitch` manda sobre él, y hay
-que quitarlo. `sudo systemctl hibernate` prueba a apagar guardando al
-momento.
+que quitarlo. `sudo systemctl hibernate` prueba a hibernar al momento.
+
+### Crear un espacio de intercambio (swap)
+
+Un ordenador hiberna en un espacio de intercambio (swap) de su disco, que
+necesita sitio para lo que el ordenador tiene en memoria: tanto como su
+memoria, para ir sobre seguro. Lo crea un administrador, por SSH o con
+una consola de texto (arriba). Estos pasos crean un fichero de
+intercambio en un disco con formato ext4, el que usa el instalador de
+Kidux; con Secure Boot activado nada de esto sirve.
+
+1. Mira cuánta memoria tiene el ordenador, y el swap que tiene ahora:
+
+   ```sh
+   free -h
+   cat /proc/swaps
+   ```
+
+2. Desactiva y quita un fichero de intercambio demasiado pequeño para la
+   memoria, si lo hay (aquí `/swapfile`), y su línea de `/etc/fstab`:
+
+   ```sh
+   sudo swapoff /swapfile
+   sudo rm /swapfile
+   sudo sed -i '\|^/swapfile |d' /etc/fstab
+   ```
+
+3. Crea un fichero de intercambio tan grande como la memoria, aquí 8 GB,
+   y úsalo en cada arranque:
+
+   ```sh
+   sudo fallocate -l 8G /swapfile
+   sudo chmod 600 /swapfile
+   sudo mkswap /swapfile
+   sudo swapon /swapfile
+   echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+   ```
+
+4. Dile al ordenador dónde encontrar la memoria cuando arranque de nuevo
+   tras hibernar: el disco que tiene el fichero, y dónde empieza el
+   fichero en él.
+
+   ```sh
+   UUID=$(findmnt -no UUID -T /swapfile)
+   OFFSET=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}')
+   printf 'RESUME=UUID=%s\nRESUME_OFFSET=%s\n' "$UUID" "$OFFSET" \
+       | sudo tee /etc/initramfs-tools/conf.d/resume
+   printf 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID=%s resume_offset=%s"\n' \
+       "$UUID" "$OFFSET" | sudo tee /etc/default/grub.d/91-resume.cfg
+   sudo update-initramfs -u
+   sudo update-grub
+   ```
+
+5. Reinicia el ordenador, abre **Suspensión e hibernación** en el panel
+   de adulto y comprueba que el aviso ha desaparecido. `sudo systemctl
+   hibernate` lo prueba al momento.
+
+Un fichero de intercambio creado de nuevo, o movido, empieza en otro
+sitio del disco: después hay que repetir el paso 4.
 
 ### Quitar Kidux de un ordenador
 

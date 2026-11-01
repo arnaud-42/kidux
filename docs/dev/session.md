@@ -382,7 +382,7 @@ which has not, and the keyboard's light after them; the first touch runs
 screen's brightness is left alone, so a desktop's screen turns off as a
 laptop's does. After the third, `kidux-idle sleep` asks the daemon,
 `System1.SleepWhenIdle`, to put the computer to sleep, or to sleep and then
-turn off saving, as the adult chose and the computer can, unless an idle
+hibernate, as the adult chose and the computer can, unless an idle
 inhibitor is held (power.md section 4).
 
 `kidux-idle` counts only while its screen's terminal is the one in front:

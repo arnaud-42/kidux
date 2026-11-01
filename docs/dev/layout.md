@@ -127,7 +127,7 @@ starts it through systemd, and its status file is
 /etc/apt/apt.conf.d/60kidux-user-agent              every fetch says it is a Kidux machine's
 /etc/apt/apt.conf.d/61kidux-statistics              and which one, while an adult shares statistics
 /etc/systemd/logind.conf.d/50-kidux-power.conf      what the lid does, as the panel says (the daemon's)
-/etc/systemd/sleep.conf.d/50-kidux-power.conf       a minute's sleep before turning off saving
+/etc/systemd/sleep.conf.d/50-kidux-power.conf       a minute's sleep before hibernating
 /usr/share/keyrings/kidux-archive-keyring.pgp       its key
 ```
 

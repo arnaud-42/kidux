@@ -309,26 +309,26 @@ have logged out.*
   (`words.CHROMIUM_OPTION_LIST`), out of the keyboard's way: Tab goes
   from the box to Save.
 
-  Beside it, after it in the keys' order, *Sleep and lid*, a button to a
-  page of its own, `panel_power`, under the same tabs (D119, power.md):
-  a line saying it is *What this computer does when its lid closes, and
-  when it is still left alone after its screen has turned off*; *When the
-  lid closes*, a list of *Sleep, and after a minute turn off saving*,
-  *Sleep* and *Nothing*, sent to `Daemon1.SetConfig` as `lid_action` as
-  soon as it is chosen, which says *Saved.* (`set_lid`), with a sentence
-  under it on another screen connected; *If still left alone*, a list of
-  the first two and *Only turn the screen off*, *after* [minutes] *min*
-  (1 to 240, twenty) and *Set*, which Enter in the box does too, sent as
-  `idle_action` and `idle_sleep_minutes`, which says *Saved. It applies
-  the next time the screen starts.* (`set_idle_sleep`), with a sentence
-  under it giving the System page's screen-off minutes and that a video
-  keeps the computer awake; a sentence on what sleeping and turning off
-  saving are; and, on a computer that cannot turn off saving or cannot
-  sleep, one more saying why, from `GetConfig`'s `hibernate_reason`
-  (Secure Boot, no swap, or that it cannot). The lists hold only what the
-  computer can do, `can_sleep` and `can_hibernate`, and show a stored
-  choice it cannot as what the daemon does instead, *Sleep*, or the last
-  of the list (`panel.power_offered`, `panel.power_shown`).
+  Beside it, after it in the keys' order, *Suspend and hibernate*, a button to a
+  page of its own, `panel_power`, under the same tabs (D119, power.md),
+  its title and no line under it: *When the lid closes*, a list of
+  *Suspend, then hibernate after a minute*, *Suspend* and *Nothing*, sent
+  to `Daemon1.SetConfig` as `lid_action` as soon as it is chosen, which
+  says *Saved.* (`set_lid`), with *With another screen connected,
+  closing the lid only turns this screen off.* under it; *Action when
+  idle*, a list of the first two and *Only turn the screen off*, *after*
+  [minutes] *min* (1 to 240, twenty) and *Set*, which Enter in the box
+  does too, sent as `idle_action` and `idle_sleep_minutes`, which says
+  *Saved. It applies the next time the screen starts.*
+  (`set_idle_sleep`), with *The screen can turn off earlier: that is set
+  on the System page.* under it; a line on what suspending is, and one
+  on what hibernating is and that it needs swap; and, on a computer that
+  cannot hibernate or cannot suspend, a warning, from `GetConfig`'s
+  `can_sleep`, `can_hibernate` and `hibernate_reason`: why (no swap,
+  Secure Boot, or that it does not work, often a swap smaller than the
+  memory), that choosing to hibernate suspends instead, and, for the
+  swap, the address of the guide's section on making one, selectable to
+  copy. Every choice is offered, and shown as stored.
 
 **Network** (D62). The machine's network, for the adult who wants to see
 it and fix it, `panel_network`, through `Network1` (daemon.md section 16):

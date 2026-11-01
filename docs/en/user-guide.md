@@ -508,9 +508,9 @@ the sound (louder, quieter and mute) do what they say, inside any module.
 The corner of the child's screen shows the new level at once.
 
 Closing the lid locks the child's session and turns the screen and the
-keyboard's light off; then the computer sleeps, and a minute later turns
-off saving, as the adult panel's **Sleep and lid** page says (section 8).
-Opening the lid wakes it and turns the screen back on, with the light as
+keyboard's light off; then the computer suspends, and a minute later
+hibernates, as the adult panel's **Suspend and hibernate** page says
+(section 8). Opening the lid wakes it and turns the screen back on, with the light as
 bright as it was, on the lock screen, where the child types their
 password to carry on. Time does not count while the lid is closed.
 
@@ -831,53 +831,50 @@ computer needs: empty is what Kidux does on its own.
 
 ![Advanced: the pointer and Chromium's options](../images/en/panel-system-advanced.png)
 
-### Sleep and lid
+### Suspend and hibernate
 
-**Sleep and lid**, beside **Advanced** at the end of the System page, is
-for what the computer does when its lid closes, and when nobody uses it
-for a long while. It knows two ways to rest:
+**Suspend and hibernate**, beside **Advanced** at the end of the System
+page, is for what the computer does when its lid closes, and when nobody
+uses it for a while:
 
-- **Sleep**: the computer stops almost everything, and wakes at once,
-  where it was, when the lid opens or a key is pressed. It still uses a
-  little battery.
-- **Turn off saving**: the computer writes everything it has open to its
-  disk and turns off. It uses no battery, and when it is turned on again
-  it starts where it was, more slowly than from sleep.
+- **Suspend**: little battery use, and the computer comes back at once,
+  where it was, when the lid opens or a key is pressed.
+- **Hibernate**: no battery use. The computer writes everything it has
+  open to its disk and turns off; turned on again, it starts where it
+  was, more slowly than from suspend. It needs a swap space on the disk
+  (below).
 
-**When the lid closes** can be:
+**When the lid closes** can be **Suspend, then hibernate after a minute**,
+which is what Kidux does until you choose: closed for a moment, the
+computer comes back at once; closed for longer, it is off and uses
+nothing. Or **Suspend**, or **Nothing**: the lid only locks the session
+and turns the screen off. It does the same on the battery and plugged in.
+With another screen connected, closing the lid only turns the laptop's
+own screen off, and the computer stays on. The choice applies as soon as
+it is made.
 
-- **Sleep, and after a minute turn off saving**, which is what Kidux does
-  until you choose: closed for a moment, the computer wakes at once;
-  closed for longer, it is off and uses nothing.
-- **Sleep**.
-- **Nothing**: the lid only locks the session and turns the screen off.
+**Action when idle** is what happens when nobody touches the computer
+for some minutes, twenty to start with: **Suspend, then hibernate after a
+minute**, **Suspend**, or **Only turn the screen off**. Choose one and the
+minutes, then press **Set**. The sign-in and lock screens take it the
+next time they start, a child's session the next time the child signs
+in. The screen can turn off earlier: that is the **Left alone** row of
+the System page. Nothing happens while a video plays or a program asks
+the computer to stay on. Each screen counts its own minutes: a child's
+session left alone locks first, and the lock screen then counts from
+the start.
 
-It does the same on the battery and plugged in. With another screen
-connected, closing the lid only turns the laptop's own screen off, and the
-computer stays awake. The choice is saved, and applies, as soon as it is
-made.
+Before the computer suspends, for any reason, a child's session locks,
+so that a child's time is never spent while the computer sleeps.
 
-**If still left alone** is what happens when nobody touches the computer
-for some minutes, twenty to start with, after its screen has turned off
-(the **Left alone** row of the System page): **Sleep, and after a minute
-turn off saving**, **Sleep**, or **Only turn the screen off**. Choose one
-and the minutes, then press **Set**. The sign-in and lock screens take it
-the next time they start, a child's session the next time the child signs
-in. Nothing happens while a video plays or a program asks the computer to
-stay awake. Each screen counts its own minutes: a child's session left
-alone locks first, and the lock screen then counts from the start.
-
-Before the computer sleeps, for any reason, a child's session locks, so
-that the time a child has is never spent while the computer sleeps.
-
-Turning off saving needs a computer that can do it: a swap space on its
-disk with room for what the computer holds in memory, and Secure Boot off
-in the computer's firmware settings, since with Secure Boot on Linux does
-not let a computer save its memory to disk. Kidux's installer makes a swap
-file the size of the memory, up to 4 GB; a computer with more memory
-in use than that cannot turn off saving. When this
-computer cannot, the page offers only **Sleep**, and says why on one line.
-A choice made before then is kept, and done as **Sleep**.
+Hibernating needs a swap space on the disk with room for what the
+computer holds in memory, and Secure Boot off in the computer's firmware
+settings, since with Secure Boot on Linux does not let a computer
+hibernate. Kidux's installer makes a swap file the size of the memory,
+up to 4 GB. When this computer cannot hibernate, the page says so in a
+warning, and why; if you choose to hibernate anyway, the computer
+suspends instead. To make a swap space, see **Making a swap space** in
+section 11.
 
 ### Network
 
@@ -1379,7 +1376,7 @@ computer is a door. To get one back for a repair:
 
 The text logins come back for that start only.
 
-### The computer does not sleep, or does not turn off saving
+### The computer does not suspend or hibernate
 
 An administrator with a text login (above), or over SSH, can see what the
 computer can do and what it did:
@@ -1388,18 +1385,75 @@ computer can do and what it did:
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager CanSuspendThenHibernate
 cat /sys/kernel/security/lockdown     # anything but [none] is Secure Boot's
-swapon --show                         # a swap space on the disk, not zram
+cat /proc/swaps                       # a swap space on the disk, not zram
 systemd-analyze cat-config systemd/logind.conf | grep -i lid
 cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
-systemd-inhibit --list                # what is keeping it awake
+systemd-inhibit --list                # what is keeping it on
 journalctl -b -1 | grep -i -e hibernat -e suspend
 ```
 
-`yes` to the first means it can sleep and then turn off saving. The lid's
+`yes` to the first means it can suspend and then hibernate. The lid's
 setting is in `/etc/systemd/logind.conf.d/50-kidux-power.conf`, which the
 panel writes; a file there or in `/usr/lib/systemd/logind.conf.d/` whose
 name sorts after it, setting `HandleLidSwitch`, wins over it, and should be
-removed. `sudo systemctl hibernate` tries turning off saving at once.
+removed. `sudo systemctl hibernate` tries hibernating at once.
+
+### Making a swap space
+
+A computer hibernates into a swap space on its disk, which needs room
+for what the computer holds in memory: as much as its memory, to be
+safe. An administrator makes one, over SSH or a text login (above).
+These steps make a swap file on a disk formatted as ext4, as Kidux's
+installer formats it; Secure Boot must be off for any of it to work.
+
+1. See how much memory the computer has, and the swap it has now:
+
+   ```sh
+   free -h
+   cat /proc/swaps
+   ```
+
+2. Turn off and remove a swap file too small for the memory, if there is
+   one (here `/swapfile`), and its line in `/etc/fstab`:
+
+   ```sh
+   sudo swapoff /swapfile
+   sudo rm /swapfile
+   sudo sed -i '\|^/swapfile |d' /etc/fstab
+   ```
+
+3. Make a swap file as large as the memory, here 8 GB, and use it from
+   every start:
+
+   ```sh
+   sudo fallocate -l 8G /swapfile
+   sudo chmod 600 /swapfile
+   sudo mkswap /swapfile
+   sudo swapon /swapfile
+   echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+   ```
+
+4. Tell the computer where to find the memory when it starts again after
+   hibernating: the disk holding the file, and where the file begins on
+   it.
+
+   ```sh
+   UUID=$(findmnt -no UUID -T /swapfile)
+   OFFSET=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}')
+   printf 'RESUME=UUID=%s\nRESUME_OFFSET=%s\n' "$UUID" "$OFFSET" \
+       | sudo tee /etc/initramfs-tools/conf.d/resume
+   printf 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID=%s resume_offset=%s"\n' \
+       "$UUID" "$OFFSET" | sudo tee /etc/default/grub.d/91-resume.cfg
+   sudo update-initramfs -u
+   sudo update-grub
+   ```
+
+5. Restart the computer, open **Suspend and hibernate** on the adult
+   panel, and check that the warning has gone. `sudo systemctl
+   hibernate` tries it at once.
+
+A swap file made anew, or moved, begins somewhere else on the disk: step 4
+has to be done again after it.
 
 ### Taking Kidux off a computer
 

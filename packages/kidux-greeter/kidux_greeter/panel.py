@@ -70,28 +70,11 @@ SCALES = (0.0, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0)
 #: defaults, and the ranges it accepts.
 IDLE_LOCK_MINUTES, SCREEN_OFF_MINUTES = 5, 10
 IDLE_LOCK_RANGE, SCREEN_OFF_RANGE = (1, 120), (1, 240)
-#: The Sleep and lid page's choices, as the daemon names them (D119), and
-#: the minutes a computer may be left alone before it sleeps.
+#: The Suspend and hibernate page's choices, as the daemon names them
+#: (D119), and the minutes a computer may be idle before it suspends.
 LID_ACTIONS = ("sleep_then_hibernate", "sleep", "nothing")
 IDLE_ACTIONS = ("sleep_then_hibernate", "sleep", "screen_off_only")
 IDLE_SLEEP_MINUTES, IDLE_SLEEP_RANGE = 20, (1, 240)
-
-
-def power_offered(choices: tuple, can_sleep: bool, can_hibernate: bool) -> list[str]:
-    """The choices this computer can do: no turning off saving where it
-    cannot, and no sleep at all where it cannot sleep."""
-    return [choice for choice in choices
-            if (choice != "sleep_then_hibernate" or can_hibernate)
-            and (choice != "sleep" or can_sleep)]
-
-
-def power_shown(chosen: str, offered: list[str]) -> str:
-    """The choice the page shows for what is stored: itself, or what the
-    computer does instead, sleep, or else the last choice, nothing or the
-    screen off only."""
-    if chosen in offered:
-        return chosen
-    return "sleep" if "sleep" in offered else offered[-1]
 MODES = ("unlimited", "daily", "manual")
 
 
@@ -972,35 +955,33 @@ class Panel(_NewChild):
         self._restart_on_close = True
         return words.APPLIES_ON_CLOSE
 
-    # --- sleep and the lid (D119) ------------------------------------------------
+    # --- suspend and hibernate (D119) --------------------------------------------
 
     def power(self, notice: str | None = None) -> Screen:
-        """What closing the lid does, and what a computer still left alone
-        does, offering only what this computer can do and saying why not,
-        as the daemon has them now."""
+        """What closing the lid does, and what a computer idle does, as the
+        daemon has them now; every choice offered, and a warning when this
+        computer cannot do some of them, which the daemon does as the
+        nearest it can (power.md section 2)."""
         try:
             self._config.update(self._daemon.config())
         except (DaemonUnavailableError, DaemonError):
             pass
         config = self._config
-        can_sleep = bool(config.get("can_sleep", True))
-        can_hibernate = bool(config.get("can_hibernate", True))
-        lids = power_offered(LID_ACTIONS, can_sleep, can_hibernate)
-        idles = power_offered(IDLE_ACTIONS, can_sleep, can_hibernate)
-        reason = None
-        if not can_sleep:
-            reason = words.CANNOT_SLEEP
-        elif not can_hibernate:
-            reason = {"secure_boot": words.NO_HIBERNATE_SECURE_BOOT,
-                      "no_swap": words.NO_HIBERNATE_NO_SWAP}.get(
-                          config.get("hibernate_reason"), words.NO_HIBERNATE)
+        warning = None
+        if not config.get("can_sleep", True):
+            warning = words.CANNOT_SLEEP
+        elif not config.get("can_hibernate", True):
+            warning = {"secure_boot": words.NO_HIBERNATE_SECURE_BOOT,
+                       "no_swap": words.NO_HIBERNATE_NO_SWAP}.get(
+                           config.get("hibernate_reason"), words.NO_HIBERNATE)
+        lid = str(config.get("lid_action", LID_ACTIONS[0]))
+        idle = str(config.get("idle_action", IDLE_ACTIONS[0]))
         return self._screen(
             "panel_power", notice,
-            lid=power_shown(str(config.get("lid_action", LID_ACTIONS[0])), lids), lids=lids,
-            idle=power_shown(str(config.get("idle_action", IDLE_ACTIONS[0])), idles),
-            idles=idles,
+            lid=lid if lid in LID_ACTIONS else LID_ACTIONS[0], lids=list(LID_ACTIONS),
+            idle=idle if idle in IDLE_ACTIONS else IDLE_ACTIONS[0], idles=list(IDLE_ACTIONS),
             idle_minutes=int(config.get("idle_sleep_minutes", IDLE_SLEEP_MINUTES)),
-            screen_off=self._screen_off_minutes(), reason=reason)
+            warning=warning)
 
     def set_lid(self, action: str) -> Screen:
         """What closing the lid does: the daemon has logind take it at once."""

@@ -80,7 +80,7 @@ def serve(
     # logind's and systemd-sleep's files as config.toml has the power
     # settings (power.py, D119): on every start, so that a machine upgraded
     # from before the settings existed gets them with their defaults, and a
-    # computer that has since gained or lost the means to turn off saving
+    # computer that has since gained or lost the means to hibernate
     # does what it now can.
     try:
         service.apply_power()

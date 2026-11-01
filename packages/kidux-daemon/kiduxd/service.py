@@ -211,7 +211,7 @@ class Service:
 
     def _power_config(self, config: Config) -> dict:
         """The power settings as chosen, and what this computer can do, for
-        the panel to offer only that and to say why (power.py, D119)."""
+        the panel to warn when it cannot (power.py, D119)."""
         can = self.power_capabilities()
         return {
             "lid_action": str(config.lid_action),
@@ -915,7 +915,7 @@ class Service:
         self.thaw_locked()
         self.logind.reboot()
 
-    # --- sleep and the lid (power.py, D119) ---------------------------------------
+    # --- suspend and hibernate (power.py, D119) -----------------------------------
 
     def power_capabilities(self) -> power.Capabilities:
         """What this computer can do, as logind says now, and why not."""
@@ -939,7 +939,7 @@ class Service:
 
     def System1_SleepWhenIdle(self, caller: Caller) -> str:
         """A screen left alone `idle_sleep_minutes` asks this (kidux-idle):
-        the computer sleeps, or sleeps and then turns off saving, as the
+        the computer sleeps, or suspends and then hibernates, as the
         adult chose and as it can, unless something holds idleness or sleep
         off, a video, a call, `systemd-inhibit --what=idle`. What it did, or
         "" for nothing."""

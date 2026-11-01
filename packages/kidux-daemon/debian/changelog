@@ -1,11 +1,11 @@
 kidux-daemon (0.3.39) trixie; urgency=medium
 
-  * The panel's Sleep and lid settings: what closing the lid does, and what
-    a computer still left alone does after its screen has turned off, sleep
-    or sleep and then turn off saving, as far as the computer can; logind
-    handles the lid from a file the daemon writes.
-  * A child's session locks before the computer sleeps, whatever puts it
-    to sleep.
+  * The panel's Suspend and hibernate settings: what closing the lid does,
+    and what a computer still left alone does after its screen has turned
+    off, suspend or suspend and then hibernate, as far as the computer
+    can; logind handles the lid from a file the daemon writes.
+  * A child's session locks before the computer suspends, whatever
+    suspends it.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:25:04 +0100
 

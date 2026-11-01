@@ -1982,7 +1982,7 @@ class View:
             left_alone.append(part)
         self._field(grid, words.LEFT_ALONE, left_alone)
         # Two pages of their own, the System page having no room left at
-        # 1280x800: the hardware's settings, and sleep and the lid (D119).
+        # 1280x800: the hardware's settings, and suspend and hibernate (D119).
         advanced = Gtk.Box(spacing=8, halign=Gtk.Align.START)
         advanced.append(self._button(words.ADVANCED_OPEN, self._ask("advanced"),
                                      text=self._(words.ADVANCED_OPEN)))
@@ -2137,16 +2137,15 @@ class View:
         return box
 
     def _draw_panel_power(self, screen, page, middle, bottom):
-        """Sleep and the lid (D119), reached from the System page: what
-        closing the lid does, saved when it is chosen; what a computer still
-        left alone does and after how many minutes, and Set; only what this
-        computer can do, and, when it cannot turn off saving, why."""
+        """Suspend and hibernate (D119), reached from the System page: what
+        closing the lid does, saved when it is chosen; what a computer idle
+        does and after how many minutes, and Set; what suspending and
+        hibernating are; and a warning when this computer cannot do some
+        of it, with the guide's address, selectable to copy."""
         self._adult(page)
         self._tab_bar(page, bottom, "system")
         data = screen.data
         middle.append(self._title(words.POWER))
-        middle.append(Gtk.Label(label=self._(words.POWER_EXPLAINED), wrap=True,
-                                max_width_chars=70, justify=Gtk.Justification.CENTER))
         grid = self._form()
         labels = {"sleep_then_hibernate": words.POWER_SLEEP_THEN_HIBERNATE,
                   "sleep": words.POWER_SLEEP, "nothing": words.POWER_NOTHING,
@@ -2177,24 +2176,24 @@ class View:
         least, most = IDLE_SLEEP_RANGE
         minutes = self._spin(int(data.get("idle_minutes", IDLE_SLEEP_MINUTES)), most,
                              set_idle_sleep, least=least)
-        still = Gtk.Box(spacing=8)
+        when_idle = Gtk.Box(spacing=8)
         for part in (idle, Gtk.Label(label=self._(words.AFTER)), minutes,
                      Gtk.Label(label=self._(words.MINUTES_SHORT)),
                      self._button(words.SET, set_idle_sleep, text=self._(words.SET))):
-            still.append(part)
-        self._field(grid, words.STILL_LEFT_ALONE, still)
-        hint = Gtk.Label(label=self._(words.LEFT_ALONE_HINT).format(
-                             minutes=int(data.get("screen_off", SCREEN_OFF_MINUTES))),
-                         xalign=0.0, wrap=True, max_width_chars=60,
-                         css_classes=["kidux-field-label"])
-        grid.attach(hint, 1, grid.kidux_rows, 1, 1)
-        grid.kidux_rows += 1
-        for message in (words.POWER_WORDS, data.get("reason")):
-            if message:
-                note = Gtk.Label(label=self._(message), xalign=0.0, wrap=True,
-                                 max_width_chars=60, css_classes=["kidux-field-label"])
-                grid.attach(note, 1, grid.kidux_rows, 1, 1)
-                grid.kidux_rows += 1
+            when_idle.append(part)
+        self._field(grid, words.IDLE_ACTION, when_idle, hint=words.IDLE_HINT)
+        lines = [self._(words.SUSPEND_EXPLAINED), self._(words.HIBERNATE_EXPLAINED)]
+        if data.get("warning"):
+            lines.append(self._(data["warning"]).format(url=self._(words.SWAP_GUIDE_URL)))
+        for number, line in enumerate(lines):
+            # The warning's address is long: it breaks anywhere, and can be
+            # selected with the pointer to copy it.
+            warning = number == 2
+            note = Gtk.Label(label=line, xalign=0.0, wrap=True, max_width_chars=60,
+                             wrap_mode=Pango.WrapMode.WORD_CHAR, selectable=warning,
+                             focusable=False, css_classes=["kidux-field-label"])
+            grid.attach(note, 1, grid.kidux_rows, 1, 1)
+            grid.kidux_rows += 1
         middle.append(grid)
         self._focus = lid
 

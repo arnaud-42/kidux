@@ -1426,10 +1426,10 @@ def test_a_module_without_settings_has_no_settings_page(panel, daemon, with_sett
 
 
 
-# --- sleep and the lid (D119) --------------------------------------------------------
+# --- suspend and hibernate (D119) ---------------------------------------------------
 
 
-def test_the_system_page_leads_to_sleep_and_the_lid(panel):
+def test_the_system_page_leads_to_suspend_and_hibernate(panel):
     panel.tab("system")
     screen = panel.power()
 
@@ -1438,40 +1438,36 @@ def test_the_system_page_leads_to_sleep_and_the_lid(panel):
         ("sleep_then_hibernate", "sleep_then_hibernate", 20)
     assert screen.data["lids"] == ["sleep_then_hibernate", "sleep", "nothing"]
     assert screen.data["idles"] == ["sleep_then_hibernate", "sleep", "screen_off_only"]
-    assert screen.data["reason"] is None
+    assert screen.data["warning"] is None
 
 
-def test_a_computer_that_cannot_turn_off_saving_is_not_offered_it_and_is_told_why(
-        panel, daemon):
-    daemon.settings.update(can_hibernate=False, hibernate_reason="secure_boot",
+@pytest.mark.parametrize("reason, message", [
+    ("no_swap", words.NO_HIBERNATE_NO_SWAP),
+    ("secure_boot", words.NO_HIBERNATE_SECURE_BOOT),
+    ("unsupported", words.NO_HIBERNATE),
+])
+def test_a_computer_that_cannot_hibernate_is_still_offered_it_with_a_warning(
+        panel, daemon, reason, message):
+    daemon.settings.update(can_hibernate=False, hibernate_reason=reason,
                            lid_action="sleep_then_hibernate")
 
     screen = panel.power()
 
-    assert screen.data["lids"] == ["sleep", "nothing"]
-    assert screen.data["idles"] == ["sleep", "screen_off_only"]
-    assert screen.data["lid"] == "sleep"           # what the daemon does instead
-    assert screen.data["reason"] == words.NO_HIBERNATE_SECURE_BOOT
+    assert screen.data["lids"] == ["sleep_then_hibernate", "sleep", "nothing"]
+    assert screen.data["lid"] == "sleep_then_hibernate"      # as chosen
+    assert screen.data["warning"] == message
 
 
-@pytest.mark.parametrize("reason, message", [
-    ("no_swap", words.NO_HIBERNATE_NO_SWAP), ("unsupported", words.NO_HIBERNATE),
-])
-def test_each_reason_has_its_words(panel, daemon, reason, message):
-    daemon.settings.update(can_hibernate=False, hibernate_reason=reason)
-
-    assert panel.power().data["reason"] == message
+def test_the_warnings_about_swap_give_the_guide_s_address():
+    for message in (words.NO_HIBERNATE_NO_SWAP, words.NO_HIBERNATE):
+        assert "{url}" in message
+    assert words.SWAP_GUIDE_URL.endswith("#making-a-swap-space")
 
 
-def test_a_computer_that_cannot_sleep_is_offered_neither(panel, daemon):
-    daemon.settings.update(can_sleep=False, can_hibernate=False, hibernate_reason="no_swap",
-                           idle_action="sleep")
+def test_a_computer_that_cannot_suspend_says_so(panel, daemon):
+    daemon.settings.update(can_sleep=False, can_hibernate=False, hibernate_reason="no_swap")
 
-    screen = panel.power()
-
-    assert (screen.data["lids"], screen.data["idles"]) == (["nothing"], ["screen_off_only"])
-    assert screen.data["idle"] == "screen_off_only"
-    assert screen.data["reason"] == words.CANNOT_SLEEP
+    assert panel.power().data["warning"] == words.CANNOT_SLEEP
 
 
 def test_the_lid_s_setting_is_saved_when_chosen(panel, daemon):
@@ -1483,7 +1479,7 @@ def test_the_lid_s_setting_is_saved_when_chosen(panel, daemon):
     assert panel.set_lid("hibernate").notice == words.NOT_SAVED
 
 
-def test_what_a_computer_still_left_alone_does_is_saved_with_its_minutes(panel, daemon):
+def test_the_action_when_idle_is_saved_with_its_minutes(panel, daemon):
     screen = panel.set_idle_sleep("sleep", 45)
 
     assert ("set_config", {"idle_action": "sleep", "idle_sleep_minutes": 45}) in daemon.calls

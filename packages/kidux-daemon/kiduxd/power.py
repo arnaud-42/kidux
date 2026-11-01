@@ -1,22 +1,22 @@
-"""Sleep and the lid: what the computer does when its lid closes, and when it
-is left alone after its screen has turned off (D119, docs/dev/power.md).
+"""Suspend and hibernate: what the computer does when its lid closes, and
+when it is left alone after its screen has turned off (D119,
+docs/dev/power.md).
 
-Two words for the adult: *sleep*, logind's suspend, and *turn off saving*,
-its hibernate. Each has a setting of config.toml: `lid_action`, what closing
-the lid does, and `idle_action`, what a computer still left alone
-`idle_sleep_minutes` after its last touch does; and `hibernate_delay_seconds`,
-which no page offers, how long a computer that sleeps and then turns off
-saving sleeps first.
+Each has a setting of config.toml: `lid_action`, what closing the lid does,
+and `idle_action`, what a computer still left alone `idle_sleep_minutes`
+after its last touch does; and `hibernate_delay_seconds`, which no page
+offers, how long a computer that suspends and then hibernates is suspended
+first. "sleep" in the names is suspend.
 
 What a computer can do is logind's word, `CanSuspend`, `CanHibernate` and
-`CanSuspendThenHibernate`; when it cannot turn off saving, the kernel's
+`CanSuspendThenHibernate`; when it cannot hibernate, the kernel's
 lockdown and its swap spaces say why. A setting the computer cannot do is
-done as the nearest one it can: sleep instead of sleeping and then turning
-off saving, and nothing, or only the screen off, instead of sleep.
+done as the nearest one it can: suspend instead of suspending and then
+hibernating, and nothing, or only the screen off, instead of suspend.
 
 The lid is logind's to handle, from `50-kidux-power.conf` in
 `/etc/systemd/logind.conf.d`, which the daemon writes; the minutes a
-computer sleeps before it turns off saving, from the file of the same name
+computer sleeps before it hibernates, from the file of the same name
 in `/etc/systemd/sleep.conf.d`. Everything here but the reading of the
 machine's files is pure, so that it is tested as it is.
 """
@@ -33,7 +33,7 @@ IDLE_ACTIONS = ("sleep_then_hibernate", "sleep", "screen_off_only")
 #: the panel offers them.
 IDLE_SLEEP_MINUTES = (1, 240)
 
-#: Why a computer cannot turn off saving: Secure Boot's lockdown, no swap
+#: Why a computer cannot hibernate: Secure Boot's lockdown, no swap
 #: space on a disk to save its memory in, or something else logind knows.
 SECURE_BOOT, NO_SWAP, UNSUPPORTED = "secure_boot", "no_swap", "unsupported"
 
@@ -50,8 +50,8 @@ SLEEP_KEYS_SINCE = {"HibernateDelaySec": 239, "HibernateOnACPower": 254}
 
 @dataclass(frozen=True)
 class Capabilities:
-    """What this computer can do: sleep, and sleep and then turn off saving;
-    when it cannot turn off saving, why (`SECURE_BOOT`, `NO_SWAP`,
+    """What this computer can do: sleep, and suspend and then hibernate;
+    when it cannot hibernate, why (`SECURE_BOOT`, `NO_SWAP`,
     `UNSUPPORTED`), and "" when it can."""
 
     sleep: bool
@@ -127,7 +127,7 @@ def logind_conf(action: str) -> str:
     another screen is connected or the laptop is docked."""
     handle = LID_HANDLES[action]
     return (
-        "# Written by kidux-daemon from the panel's *Sleep and lid* page\n"
+        "# Written by kidux-daemon from the panel's *Suspend and hibernate* page\n"
         "# (docs/dev/power.md). Changes here are lost at the next change there.\n"
         "[Login]\n"
         f"HandleLidSwitch={handle}\n"
@@ -138,11 +138,11 @@ def logind_conf(action: str) -> str:
 
 def sleep_conf(delay_seconds: int, systemd_version: int) -> str:
     """`50-kidux-power.conf` for systemd-sleep: sleep `delay_seconds`, then
-    turn off saving, on battery and on mains power alike; each key only
+    hibernate, on battery and on mains power alike; each key only
     where this systemd knows it."""
     lines = [
         "# Written by kidux-daemon (docs/dev/power.md): how long a computer that",
-        "# sleeps and then turns off saving sleeps first.",
+        "# suspends and then hibernates sleeps first.",
         "[Sleep]",
     ]
     for key, value in (("HibernateDelaySec", f"{int(delay_seconds)}s"),

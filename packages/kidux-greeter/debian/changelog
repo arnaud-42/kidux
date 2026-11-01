@@ -1,9 +1,10 @@
 kidux-greeter (0.2.60) trixie; urgency=medium
 
-  * The panel's Sleep and lid page: what closing the lid does, and what a
-    computer still left alone does, sleep or sleep and then turn off saving,
-    offering only what the computer can do and saying why not.
-  * A child's session is told when to ask the computer to sleep.
+  * The panel's Suspend and hibernate page: what closing the lid does, and
+    the action when the computer is idle, suspend or suspend and then
+    hibernate, with a warning, and the guide's address for making a swap
+    space, when the computer cannot hibernate.
+  * A child's session is told when to ask the computer to suspend.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100
 

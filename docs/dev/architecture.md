@@ -2071,20 +2071,21 @@ Taken while planning `phase-3-plan.md`, which explains each in its section 3.
   an Apple processor UTM emulates the PC, and the page asks for four
   cores, since two are too slow to use.
 
-- **D119 — A closed lid and a computer left alone sleep, and then turn
-  off saving; a child's session locks before any sleep.** Decided
+- **D119 — A closed lid and a computer left alone suspend, and then
+  hibernate; a child's session locks before any sleep.** Decided
   2026-10-31 by the owner. Closing the lid sleeps at once and, still closed
   a minute later, hibernates (systemd's suspend-then-hibernate,
   `HibernateDelaySec=60s`), on battery as on mains power, and does
   nothing while docked or with another screen connected; a computer
   still left alone `idle_sleep_minutes` (twenty) after its last touch
   does the same, as the second stage after D67's screen off, unless an
-  idle inhibitor is held. The adult chooses each on the panel's *Sleep
-  and lid* page: sleep then turn off saving, sleep, or nothing (for the
-  lid) or the screen off only (for idleness); in the panel's words
-  *Dormir* and *Apagar guardando*. Only what logind says the computer can
-  do is offered, and the panel says why not, Secure Boot's lockdown or no
-  swap; a stored hibernating choice is done as sleep. logind handles the
+  idle inhibitor is held. The adult chooses each on the panel's *Suspend
+  and hibernate* page: suspend then hibernate, suspend, or nothing (for
+  the lid) or the screen off only (for idleness), in those words, which
+  the adult reading that page understands. Every choice is offered;
+  where logind says the computer cannot hibernate, the page warns why,
+  Secure Boot's lockdown or no swap, with the guide's address for making
+  a swap space, and a hibernating choice is done as suspend. logind handles the
   lid from a drop-in the daemon writes, reloaded by SIGHUP, so
   kidux-session's drop-in no longer has it ignore the lid; what kept a
   closed lid from being a way out of a time limit is now the daemon's

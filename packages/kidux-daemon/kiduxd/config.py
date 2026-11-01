@@ -37,7 +37,7 @@ DEFAULTS = {
     "apt_statistics_id": "",
     # What closing the lid does, what a computer still left alone this many
     # minutes after its last touch does, and how long a computer that sleeps
-    # and then turns off saving sleeps first, which no page offers (power.py,
+    # and then hibernates sleeps first, which no page offers (power.py,
     # D119). A machine whose config.toml predates them takes these.
     "lid_action": "sleep_then_hibernate",
     "idle_action": "sleep_then_hibernate",

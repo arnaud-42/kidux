@@ -11,7 +11,7 @@ keyboard's light off after the screen, remembered where the lock screen,
 on which the lid is opened, finds it to give it back (D97). Nothing else
 changes: the screen's brightness stays what it was, windows stay where
 they are, and an external screen stays on. Whether the computer then
-sleeps is logind's, as the adult set it on the panel's *Sleep and lid*
+sleeps is logind's, as the adult set it on the panel's *Suspend and hibernate*
 page (power.md, D119); before it sleeps the daemon locks the session
 itself, so closing the lid is never a way out of a time limit.
 """

@@ -117,11 +117,10 @@ def daily_upgrade(machine: Machine) -> None:
     root(f"rm -f {STAND_IN} {RAN} && systemctl daemon-reload")
 
 
-def sleep_and_lid(machine: Machine) -> None:
-    """The System page's Sleep and lid (D119): on this machine, which can
-    sleep but has no swap to turn off saving in, only Sleep and Nothing,
-    and the line saying why; Nothing chosen for the lid is written for
-    logind at once."""
+def suspend_and_hibernate(machine: Machine) -> None:
+    """The System page's Suspend and hibernate (D119): on this machine,
+    which can suspend but has no swap to hibernate in, the lid's setting
+    suspends; Nothing chosen for the lid is written for logind at once."""
     open_panel(machine)
     machine.still()
     for _ in range(5 + children_count() + 3):
@@ -137,7 +136,7 @@ def sleep_and_lid(machine: Machine) -> None:
     shown = machine.shown("panel_power", before, 10)
     machine.screenshot("panel-system-power")
     conf = "/etc/systemd/logind.conf.d/50-kidux-power.conf"
-    report("Sleep and lid, beside Advanced, offers what this machine can do",
+    report("Suspend and hibernate, beside Advanced, has the lid suspend on this machine",
            shown and "HandleLidSwitch=suspend\n" in root(f"cat {conf}").stdout,
            greeter_log() + root(f"cat {conf}").stdout)
 
@@ -253,5 +252,5 @@ def run(machine: Machine) -> None:
     root("rm -f /etc/apt/sources.list.d/kidux-test-canary.list")
     machine.still()
 
-    sleep_and_lid(machine)
+    suspend_and_hibernate(machine)
     daily_upgrade(machine)

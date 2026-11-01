@@ -1,15 +1,16 @@
-# Sleep and the lid
+# Suspend and hibernate
 
 What a Kidux computer does when its lid closes, and when it is left alone
-after its screen has turned off (D119). The adult's words are *sleep*,
-logind's suspend, and *turn off saving* ("Apagar guardando"), its hibernate;
-*sleep, and after a minute turn off saving* is systemd's
-suspend-then-hibernate.
+after its screen has turned off (D119). The panel says *suspend*
+("Suspender") and *hibernate* ("Hibernar"), logind's words, which the
+adult reading the page understands; *suspend, then hibernate after a
+minute* is systemd's suspend-then-hibernate. In the code, "sleep" is
+suspend.
 
 ## 1. The settings
 
 Three settings in `config.toml` (`kiduxd/config.py`), on the panel's
-*Sleep and lid* page (panel.md), and one that no page offers:
+*Suspend and hibernate* page (panel.md), and one that no page offers:
 
 | Key | Values | Default |
 |---|---|---|
@@ -32,7 +33,7 @@ takes the three (daemon.md section 15).
 
 `kiduxd/power.py`, pure but for reading two files, asks logind, as root,
 `CanSuspend`, `CanHibernate` and `CanSuspendThenHibernate`: anything but
-`yes` is a no, and the computer can turn off saving only when both of the
+`yes` is a no, and the computer can hibernate only when both of the
 last two are `yes`. When it cannot, the reason is, in this order:
 
 - `secure_boot`: `/sys/kernel/security/lockdown` has anything but `[none]`
@@ -47,8 +48,11 @@ A setting the computer cannot do is done as the nearest one it can, and
 the setting itself is kept: `sleep_then_hibernate` as `sleep`, and `sleep`,
 on a computer that cannot sleep, as `nothing` for the lid and
 `screen_off_only` for idleness (`power.lid_action`, `power.idle_action`).
-The panel offers only what the computer can do, shows a stored setting it
-cannot as what is done instead, and says the reason in one line.
+The panel offers every choice, shows the setting as stored, and warns in
+one line when the computer cannot hibernate, or cannot suspend: why, and
+that choosing to hibernate suspends instead; for no swap, or a swap too
+small, with the address of the guide's section on making a swap space
+(`words.SWAP_GUIDE_URL`, in the screen's language).
 
 ## 3. The lid
 
@@ -151,7 +155,8 @@ large as the memory in use), as its administrator over SSH:
 6. With another screen connected, the lid only turns the laptop's panel
    off, and the computer stays awake.
 7. On a computer that cannot hibernate (Secure Boot on, or no swap): the
-   *Sleep and lid* page offers only *Sleep*, with the line saying why, and
-   the lid sleeps (`HandleLidSwitch=suspend` in the drop-in).
+   *Suspend and hibernate* page warns why, with the guide's address for
+   no swap, and the lid suspends (`HandleLidSwitch=suspend` in the
+   drop-in).
 8. `systemd-analyze cat-config systemd/logind.conf` shows the drop-in last
    for the lid; `systemd-inhibit --list` shows Kidux's delay lock.

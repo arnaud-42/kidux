@@ -15,7 +15,7 @@ the daemon to lock the child's session (0, on the trusted screens, arms
 nothing), and after KIDUX_SCREEN_OFF_SECONDS `kidux-idle screen off`,
 turned on again at the first touch, and after KIDUX_IDLE_SLEEP_SECONDS
 `kidux-idle sleep`, which asks the daemon to put the computer to sleep, or
-to sleep and then turn off saving, as the adult chose (0 arms nothing;
+to suspend and then hibernate, as the adult chose (0 arms nothing;
 D119). It stops `swayidle` while another
 terminal is in front, and starts it afresh when this one comes back or
 when it finds it was frozen, so that a count never runs under the lock
