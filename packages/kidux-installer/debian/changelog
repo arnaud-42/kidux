@@ -1,3 +1,10 @@
+kidux-installer (0.1.1) trixie; urgency=medium
+
+  * The installed computer can hibernate: a swap file as large as the
+    memory, and the start after hibernating told where it is.
+
+ -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 17:52:37 +0100
+
 kidux-installer (0.1.0) trixie; urgency=medium
 
   * Kidux's installer, for the live system of Kidux's image: Calamares with

@@ -871,8 +871,9 @@ Hibernating needs a swap space on the disk with room for what the
 computer holds in memory, and Secure Boot off in the computer's firmware
 settings, since with Secure Boot on Linux does not let a computer
 hibernate. The computer must also know, when it starts again, where its
-memory was saved. Kidux's installer makes a swap file the size of the
-memory, up to 4 GB. When this computer cannot hibernate, the page says so in a
+memory was saved. Kidux sets both up by itself, when it is installed and
+at every update, where the disk has room (section 11, **Making a swap
+space**). When this computer cannot hibernate, the page says so in a
 warning, and why; if you choose to hibernate anyway, the computer
 suspends instead. To make a swap space, see **Making a swap space** in
 section 11.
@@ -1401,64 +1402,26 @@ removed. `sudo systemctl hibernate` tries hibernating at once.
 
 ### Making a swap space
 
-A computer hibernates into a swap space on its disk, which needs room
-for what the computer holds in memory: as much as its memory, to be
-safe. An administrator makes one, over SSH or a text login (above).
-These steps make a swap file on a disk formatted as ext4, as Kidux's
-installer formats it; Secure Boot must be off for any of it to work.
+A computer hibernates into a swap space on its disk, as large as its
+memory, and starts again from it only if it knows where it is. Kidux
+makes both by itself, when it is installed, from the image or on Debian,
+and at every update: a swap file as large as the memory, on the system's
+partition, or on the one of `/home` when the system's has no room, always
+leaving 4 GB free; and the place of that file, given to the start. It
+does nothing with Secure Boot on, which forbids hibernating, or when
+neither partition has room.
 
-1. See how much memory the computer has, and the swap it has now:
+When the page still warns, an administrator can do it again, and read
+why it did not, over SSH or a text login (above):
 
-   ```sh
-   free -h
-   cat /proc/swaps
-   ```
+```sh
+sudo kidux-hibernate-setup
+journalctl -t kidux-hibernate-setup
+```
 
-2. Turn off and remove a swap file too small for the memory, if there is
-   one (here `/swapfile`), and its line in `/etc/fstab`:
-
-   ```sh
-   sudo swapoff /swapfile
-   sudo rm /swapfile
-   sudo sed -i '\|^/swapfile |d' /etc/fstab
-   ```
-
-3. Make a swap file as large as the memory, here 8 GB, and use it from
-   every start:
-
-   ```sh
-   sudo fallocate -l 8G /swapfile
-   sudo chmod 600 /swapfile
-   sudo mkswap /swapfile
-   sudo swapon /swapfile
-   echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
-   ```
-
-4. Tell the computer where to find the memory when it starts again after
-   hibernating: the disk holding the file, and where the file begins on
-   it.
-
-   ```sh
-   UUID=$(findmnt -no UUID -T /swapfile)
-   OFFSET=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}')
-   printf 'RESUME=UUID=%s\nRESUME_OFFSET=%s\n' "$UUID" "$OFFSET" \
-       | sudo tee /etc/initramfs-tools/conf.d/resume
-   printf 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID=%s resume_offset=%s"\n' \
-       "$UUID" "$OFFSET" | sudo tee /etc/default/grub.d/91-resume.cfg
-   sudo update-initramfs -u
-   sudo update-grub
-   ```
-
-5. Restart the computer, open **Suspend and hibernate** on the adult
-   panel, and check that the warning has gone. `sudo systemctl
-   hibernate` tries it at once.
-
-When the page warns that the computer does not know where to find its
-memory, the swap space is there but step 4 was never done: do steps 4
-and 5 alone.
-
-A swap file made anew, or moved, begins somewhere else on the disk: step 4
-has to be done again after it.
+It says what it did, or why not: Secure Boot, or how many GB it needs
+and did not find. Once it has made the swap file, the computer can
+hibernate at once, and the warning on the page goes.
 
 ### Taking Kidux off a computer
 

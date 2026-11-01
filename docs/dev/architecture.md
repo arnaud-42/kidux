@@ -98,7 +98,7 @@ Guided layout applied by the installer (GPT on both UEFI and BIOS machines):
 | ESP (UEFI) or BIOS boot | 512 MB / 1 MB | `/boot/efi` | Bootloader. |
 | system | 24 GB (min 16) | `/` | Debian + our packages. Formatted on reinstall. |
 | data | rest of disk | `/home` | Never formatted on reinstall. |
-| swap | file on `/` | — | Sized to RAM up to 4 GB, created by the installer (phase 2). |
+| swap | file on `/`, or on `/home` where `/` has no room | — | As large as the memory, in whole GiB, so that the computer can hibernate; made by the installer and by `kidux-session` at every install and upgrade, `kidux-hibernate-setup` (D119, power.md). |
 
 Both are ext4. Btrfs snapshots were considered and rejected for now (see decision log).
 
@@ -2093,6 +2093,13 @@ Taken while planning `phase-3-plan.md`, which explains each in its section 3.
   sleep, whatever caused it. The second stage goes through the daemon
   (`System1.SleepWhenIdle`), not logind's `IdleAction`, which needs an
   `IdleHint` from every session, and not the screens themselves, which
-  polkit does not let suspend. Kidux never changes swap, the kernel's
-  command line or Secure Boot: it reads what the computer can do and
-  says it (power.md).
+  polkit does not let suspend. Kidux never changes Secure Boot. It makes
+  the computer able to hibernate where it can, at its installation and
+  at every upgrade, as the owner decided the same day once a MacBook
+  hibernated and started afresh: `kidux-hibernate-setup`, in
+  kidux-session's postinst and in a step of the installer, makes the swap
+  file as large as the memory and gives Debian's initramfs and the
+  kernel's command line the resume device and offset, and does nothing
+  under Secure Boot, without room, or once done; and logind's yes alone
+  is not taken for an answer, the resume device has to be set too
+  (power.md).

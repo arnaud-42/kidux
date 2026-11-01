@@ -904,8 +904,9 @@ Hibernar necesita un espacio de intercambio (swap) en el disco con sitio
 para lo que el ordenador tiene en memoria, y Secure Boot desactivado en
 los ajustes del firmware del ordenador, porque con Secure Boot activado
 Linux no deja hibernar. Además, el ordenador tiene que saber, al arrancar
-de nuevo, dónde guardó la memoria. El instalador de Kidux crea un fichero
-de intercambio del tamaño de la memoria, hasta 4 GB. Cuando este ordenador
+de nuevo, dónde guardó la memoria. Kidux prepara ambas cosas por su
+cuenta, al instalarse y en cada actualización, cuando el disco tiene sitio
+(sección 11, **Crear un espacio de intercambio (swap)**). Cuando este ordenador
 no puede hibernar, la página lo dice en un aviso, y por qué; si eliges
 hibernar de todos modos, el ordenador se suspende en su lugar. Para crear
 un espacio de swap, mira **Crear un espacio de intercambio (swap)** en la
@@ -1449,65 +1450,26 @@ que quitarlo. `sudo systemctl hibernate` prueba a hibernar al momento.
 
 ### Crear un espacio de intercambio (swap)
 
-Un ordenador hiberna en un espacio de intercambio (swap) de su disco, que
-necesita sitio para lo que el ordenador tiene en memoria: tanto como su
-memoria, para ir sobre seguro. Lo crea un administrador, por SSH o con
-una consola de texto (arriba). Estos pasos crean un fichero de
-intercambio en un disco con formato ext4, el que usa el instalador de
-Kidux; con Secure Boot activado nada de esto sirve.
+Un ordenador hiberna en un espacio de intercambio (swap) de su disco, tan
+grande como su memoria, y solo vuelve a empezar desde él si sabe dónde
+está. Kidux crea ambas cosas por su cuenta, al instalarse, con la imagen o
+sobre Debian, y en cada actualización: un fichero de intercambio tan
+grande como la memoria, en la partición del sistema, o en la de `/home`
+si en la del sistema no cabe, dejando siempre 4 GB libres; y el sitio de
+ese fichero, para el arranque. No hace nada con Secure Boot activado, que
+no deja hibernar, ni cuando no cabe en ninguna de las dos particiones.
 
-1. Mira cuánta memoria tiene el ordenador, y el swap que tiene ahora:
+Si la página sigue avisando, un administrador puede repetirlo y ver por
+qué no se hizo, por SSH o con una consola de texto (arriba):
 
-   ```sh
-   free -h
-   cat /proc/swaps
-   ```
+```sh
+sudo kidux-hibernate-setup
+journalctl -t kidux-hibernate-setup
+```
 
-2. Desactiva y quita un fichero de intercambio demasiado pequeño para la
-   memoria, si lo hay (aquí `/swapfile`), y su línea de `/etc/fstab`:
-
-   ```sh
-   sudo swapoff /swapfile
-   sudo rm /swapfile
-   sudo sed -i '\|^/swapfile |d' /etc/fstab
-   ```
-
-3. Crea un fichero de intercambio tan grande como la memoria, aquí 8 GB,
-   y úsalo en cada arranque:
-
-   ```sh
-   sudo fallocate -l 8G /swapfile
-   sudo chmod 600 /swapfile
-   sudo mkswap /swapfile
-   sudo swapon /swapfile
-   echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
-   ```
-
-4. Dile al ordenador dónde encontrar la memoria cuando arranque de nuevo
-   tras hibernar: el disco que tiene el fichero, y dónde empieza el
-   fichero en él.
-
-   ```sh
-   UUID=$(findmnt -no UUID -T /swapfile)
-   OFFSET=$(sudo filefrag -v /swapfile | awk '$1=="0:" {print substr($4, 1, length($4)-2)}')
-   printf 'RESUME=UUID=%s\nRESUME_OFFSET=%s\n' "$UUID" "$OFFSET" \
-       | sudo tee /etc/initramfs-tools/conf.d/resume
-   printf 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT resume=UUID=%s resume_offset=%s"\n' \
-       "$UUID" "$OFFSET" | sudo tee /etc/default/grub.d/91-resume.cfg
-   sudo update-initramfs -u
-   sudo update-grub
-   ```
-
-5. Reinicia el ordenador, abre **Suspensión e hibernación** en el panel
-   de adulto y comprueba que el aviso ha desaparecido. `sudo systemctl
-   hibernate` lo prueba al momento.
-
-Cuando la página avisa de que el ordenador no sabe dónde encontrar su
-memoria, el swap ya existe pero falta el paso 4: haz solo los pasos 4 y
-5.
-
-Un fichero de intercambio creado de nuevo, o movido, empieza en otro
-sitio del disco: después hay que repetir el paso 4.
+Dice lo que hizo, o por qué no: Secure Boot, o cuántos GB necesita y no
+encontró. En cuanto ha creado el fichero, el ordenador ya puede hibernar, y el
+aviso de la página desaparece.
 
 ### Quitar Kidux de un ordenador
 

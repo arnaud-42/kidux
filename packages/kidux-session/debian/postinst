@@ -11,7 +11,8 @@
 # need to set the backlight and the light, and which takes effect at their
 # next start; and the directory where the keyboard's light is remembered
 # while the screen is off (D97), which debhelper's tmpfiles snippet below
-# makes at once.
+# makes at once. And the swap space and resume device that let the
+# computer hibernate (kidux-hibernate-setup), which take effect at once.
 
 set -e
 
@@ -40,6 +41,13 @@ case "$1" in
                 && [ "$(plymouth-set-default-theme)" != kidux ]; then
             plymouth-set-default-theme kidux --rebuild-initrd >/dev/null 2>&1 || true
         fi
+        # A swap space as large as the memory, and the start after
+        # hibernating told where it is, so that the computer can suspend and
+        # then hibernate (D119, power.md). It does nothing in a chroot, under
+        # Secure Boot, without room, or once done; it never fails the
+        # installation, and makes the initramfs and GRUB's configuration
+        # again itself when it changes them.
+        /usr/sbin/kidux-hibernate-setup || true
         if command -v update-grub >/dev/null 2>&1 && [ -e /boot/grub/grub.cfg ]; then
             update-grub >/dev/null 2>&1 || true
         fi

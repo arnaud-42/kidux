@@ -144,7 +144,43 @@ spent while the computer sleeps; the launcher's own lock for the lid
 (`LockFor("lid")`), which usually arrives first, finds it locked, or is
 found locked.
 
-## 6. Trying it by hand
+## 6. Making the computer able to hibernate
+
+`kidux-hibernate-setup`, in `kidux-session` at `/usr/sbin`, gives the
+computer what hibernating needs: a swap space as large as the memory, and
+the start after hibernating told where it is. `kidux-session`'s postinst
+runs it at every install and upgrade, and the installer runs it with
+`--install` in the new system, before it makes the initramfs and GRUB's
+configuration (`shellprocess@kidux-hibernate`).
+
+- A swap partition at least as large as the memory is used as it is.
+- Otherwise the swap file, `/swapfile`, is made, or made again, as large
+  as `MemTotal` rounded up to a whole GiB, where it fits with 4 GiB left
+  free: on `/`, counting the room an old swap file there gives back, or
+  else on `/home`, when it is a filesystem of its own, as
+  `/home/.kidux-swapfile`; `/etc/fstab` gets it as its one swap file of
+  the two. A swap file in use is taken out of use first, and when swapoff
+  refuses nothing more is done.
+- The device's UUID and the file's first block, in pages (`filefrag -v`),
+  go to Debian's initramfs, `/etc/initramfs-tools/conf.d/resume`
+  (`RESUME=UUID=…`, `RESUME_OFFSET=…`, over the `RESUME=none` Debian's
+  installer writes for a swap file), and to the kernel's command line,
+  `/etc/default/grub.d/91-kidux-resume.cfg` (`resume=UUID=… resume_offset=…`),
+  which `09_kidux` takes with `GRUB_CMDLINE_LINUX_DEFAULT`.
+- On a running computer, the kernel is told too, `/sys/power/resume_offset`
+  and then `/sys/power/resume`, as the initramfs tells it at a start, so
+  that the computer hibernates before any restart; and the initramfs and
+  GRUB's configuration are made again.
+
+It does nothing in a chroot or an image being built, under Secure Boot's
+lockdown, when the memory's size cannot be read, without room, or when
+the resume device is set and the swap is large enough already; it prints
+and logs (`kidux-hibernate-setup` in the journal) what it did or why not,
+and never fails the package's installation. Purging `kidux-session`
+removes `91-kidux-resume.cfg`; the swap file and the initramfs's resume
+setting stay, the machine's own.
+
+## 7. Trying it by hand
 
 On a Kidux laptop that can hibernate (Secure Boot off, a swap space as
 large as the memory in use), as its administrator over SSH:

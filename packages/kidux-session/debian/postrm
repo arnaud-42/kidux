@@ -17,6 +17,12 @@ case "$1" in
                 && [ "$(plymouth-set-default-theme)" = kidux ]; then
             plymouth-set-default-theme --reset --rebuild-initrd >/dev/null 2>&1 || true
         fi
+        # The resume device kidux-hibernate-setup gave the kernel's command
+        # line goes with the package; the swap file, in /etc/fstab, and
+        # the initramfs's resume setting stay, being the machine's own now.
+        if [ "$1" = purge ]; then
+            rm -f /etc/default/grub.d/91-kidux-resume.cfg
+        fi
         if [ -d /run/systemd/system ]; then
             systemctl --system daemon-reload >/dev/null || true
         fi
