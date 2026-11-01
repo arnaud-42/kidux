@@ -9,7 +9,7 @@ Build-Depends: debhelper-compat (= 13),
                python3-setuptools,
                pyflakes3 <!nocheck>,
                python3-gi <!nocheck>,
-               python3-kidux (>= 0.1.59~) <!nocheck>,
+               python3-kidux (>= 0.1.61~) <!nocheck>,
                python3-pytest <!nocheck>,
 Standards-Version: 4.7.2
 Rules-Requires-Root: no
@@ -26,7 +26,7 @@ Depends: ${misc:Depends},
          gir1.2-rsvg-2.0,
          python3-gi,
          python3-gi-cairo,
-         python3-kidux (>= 0.1.59~),
+         python3-kidux (>= 0.1.61~),
          wireplumber,
 Description: Kidux sign-in and lock screens
  Kidux is a Debian derivative for a child's first computer. This package is

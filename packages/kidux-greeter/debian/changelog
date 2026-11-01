@@ -1,3 +1,12 @@
+kidux-greeter (0.2.60) trixie; urgency=medium
+
+  * The panel's Sleep and lid page: what closing the lid does, and what a
+    computer still left alone does, sleep or sleep and then turn off saving,
+    offering only what the computer can do and saying why not.
+  * A child's session is told when to ask the computer to sleep.
+
+ -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100
+
 kidux-greeter (0.2.59) trixie; urgency=medium
 
   * Kidux is free software: GPL-3.0-or-later, in LICENSE and debian/copyright.

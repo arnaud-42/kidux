@@ -127,6 +127,32 @@ SPEED_STEPS = (N_("Much slower"), N_("Slower"), N_("Normal"), N_("Faster"), N_("
 POINTER_EXPLAINED = N_("On a touchpad, two fingers scroll the page; Normal scrolls half "
                        "as far as most computers do.")
 APPLIES_NEXT_SIGN_IN = N_("Saved. It applies the next time a child signs in.")
+#: The panel's Sleep and lid page (D119): "sleep" is suspend, "turn off
+#: saving" is hibernate, the computer's memory saved to disk and the
+#: computer off, started again where it was.
+POWER_OPEN = N_("Sleep and lid")
+POWER = N_("Sleep and lid")
+POWER_EXPLAINED = N_("What this computer does when its lid closes, and when it is still left "
+                     "alone after its screen has turned off.")
+LID_CLOSES = N_("When the lid closes")
+LID_HINT = N_("With another screen connected, closing the lid only turns this one off.")
+STILL_LEFT_ALONE = N_("If still left alone")
+LEFT_ALONE_HINT = N_("The screen turns off after {minutes} min, as the System page says. "
+                     "Nothing happens while a video plays.")
+AFTER = N_("after")
+POWER_SLEEP_THEN_HIBERNATE = N_("Sleep, and after a minute turn off saving")
+POWER_SLEEP = N_("Sleep")
+POWER_NOTHING = N_("Nothing")
+POWER_SCREEN_OFF_ONLY = N_("Only turn the screen off")
+POWER_WORDS = N_("Sleeping, the computer wakes at once where it was, but uses a little "
+                 "battery. Turned off saving, it uses none, and starts again where it was, "
+                 "more slowly.")
+NO_HIBERNATE_SECURE_BOOT = N_("This computer cannot turn off saving: Secure Boot is on, and "
+                              "then Linux does not let it save its memory to the disk.")
+NO_HIBERNATE_NO_SWAP = N_("This computer cannot turn off saving: its disk has no swap space "
+                          "to save its memory in.")
+NO_HIBERNATE = N_("This computer cannot turn off saving.")
+CANNOT_SLEEP = N_("This computer cannot sleep.")
 CHROMIUM_OPTIONS = N_("Chromium's options")
 CHROMIUM_OPTIONS_EXPLAINED = N_(
     "If a web module, Scratch for instance, or ScratchJr, which is Chromium inside, "

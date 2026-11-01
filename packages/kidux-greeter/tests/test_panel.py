@@ -1108,7 +1108,7 @@ def test_every_panel_screen_has_a_way_forward(panel, daemon, with_settings):
                panel.ask_remove_module("hello"), panel.install_module("gcompris"),
                panel.poll_modules(), panel.remove_module("hello"), panel.look_for_modules(),
                panel.tab("system"), panel.show_recovery(),
-               panel.look_for_updates(), panel.restart_now(), panel.advanced(),
+               panel.look_for_updates(), panel.restart_now(), panel.advanced(), panel.power(),
                panel.tab("network"), panel.ask_wifi_password("Neighbours"),
                panel.ask_forget_wifi("Home")]
     for screen in screens:
@@ -1424,3 +1424,69 @@ def test_a_setting_is_saved_when_changed_and_a_wrong_one_said(panel, daemon, wit
 def test_a_module_without_settings_has_no_settings_page(panel, daemon, with_settings):
     assert panel.module_settings("paint").name == "panel_modules"
 
+
+
+# --- sleep and the lid (D119) --------------------------------------------------------
+
+
+def test_the_system_page_leads_to_sleep_and_the_lid(panel):
+    panel.tab("system")
+    screen = panel.power()
+
+    assert screen.name == "panel_power"
+    assert (screen.data["lid"], screen.data["idle"], screen.data["idle_minutes"]) == \
+        ("sleep_then_hibernate", "sleep_then_hibernate", 20)
+    assert screen.data["lids"] == ["sleep_then_hibernate", "sleep", "nothing"]
+    assert screen.data["idles"] == ["sleep_then_hibernate", "sleep", "screen_off_only"]
+    assert screen.data["reason"] is None
+
+
+def test_a_computer_that_cannot_turn_off_saving_is_not_offered_it_and_is_told_why(
+        panel, daemon):
+    daemon.settings.update(can_hibernate=False, hibernate_reason="secure_boot",
+                           lid_action="sleep_then_hibernate")
+
+    screen = panel.power()
+
+    assert screen.data["lids"] == ["sleep", "nothing"]
+    assert screen.data["idles"] == ["sleep", "screen_off_only"]
+    assert screen.data["lid"] == "sleep"           # what the daemon does instead
+    assert screen.data["reason"] == words.NO_HIBERNATE_SECURE_BOOT
+
+
+@pytest.mark.parametrize("reason, message", [
+    ("no_swap", words.NO_HIBERNATE_NO_SWAP), ("unsupported", words.NO_HIBERNATE),
+])
+def test_each_reason_has_its_words(panel, daemon, reason, message):
+    daemon.settings.update(can_hibernate=False, hibernate_reason=reason)
+
+    assert panel.power().data["reason"] == message
+
+
+def test_a_computer_that_cannot_sleep_is_offered_neither(panel, daemon):
+    daemon.settings.update(can_sleep=False, can_hibernate=False, hibernate_reason="no_swap",
+                           idle_action="sleep")
+
+    screen = panel.power()
+
+    assert (screen.data["lids"], screen.data["idles"]) == (["nothing"], ["screen_off_only"])
+    assert screen.data["idle"] == "screen_off_only"
+    assert screen.data["reason"] == words.CANNOT_SLEEP
+
+
+def test_the_lid_s_setting_is_saved_when_chosen(panel, daemon):
+    screen = panel.set_lid("nothing")
+
+    assert ("set_config", {"lid_action": "nothing"}) in daemon.calls
+    assert (screen.name, screen.notice, screen.data["lid"]) == \
+        ("panel_power", words.SAVED, "nothing")
+    assert panel.set_lid("hibernate").notice == words.NOT_SAVED
+
+
+def test_what_a_computer_still_left_alone_does_is_saved_with_its_minutes(panel, daemon):
+    screen = panel.set_idle_sleep("sleep", 45)
+
+    assert ("set_config", {"idle_action": "sleep", "idle_sleep_minutes": 45}) in daemon.calls
+    assert (screen.notice, screen.data["idle"], screen.data["idle_minutes"]) == \
+        (words.APPLIES_NEXT_START, "sleep", 45)
+    assert panel.set_idle_sleep("nothing", 45).notice == words.NOT_SAVED

@@ -70,6 +70,28 @@ SCALES = (0.0, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0)
 #: defaults, and the ranges it accepts.
 IDLE_LOCK_MINUTES, SCREEN_OFF_MINUTES = 5, 10
 IDLE_LOCK_RANGE, SCREEN_OFF_RANGE = (1, 120), (1, 240)
+#: The Sleep and lid page's choices, as the daemon names them (D119), and
+#: the minutes a computer may be left alone before it sleeps.
+LID_ACTIONS = ("sleep_then_hibernate", "sleep", "nothing")
+IDLE_ACTIONS = ("sleep_then_hibernate", "sleep", "screen_off_only")
+IDLE_SLEEP_MINUTES, IDLE_SLEEP_RANGE = 20, (1, 240)
+
+
+def power_offered(choices: tuple, can_sleep: bool, can_hibernate: bool) -> list[str]:
+    """The choices this computer can do: no turning off saving where it
+    cannot, and no sleep at all where it cannot sleep."""
+    return [choice for choice in choices
+            if (choice != "sleep_then_hibernate" or can_hibernate)
+            and (choice != "sleep" or can_sleep)]
+
+
+def power_shown(chosen: str, offered: list[str]) -> str:
+    """The choice the page shows for what is stored: itself, or what the
+    computer does instead, sleep, or else the last choice, nothing or the
+    screen off only."""
+    if chosen in offered:
+        return chosen
+    return "sleep" if "sleep" in offered else offered[-1]
 MODES = ("unlimited", "daily", "manual")
 
 
@@ -950,6 +972,65 @@ class Panel(_NewChild):
         self._restart_on_close = True
         return words.APPLIES_ON_CLOSE
 
+    # --- sleep and the lid (D119) ------------------------------------------------
+
+    def power(self, notice: str | None = None) -> Screen:
+        """What closing the lid does, and what a computer still left alone
+        does, offering only what this computer can do and saying why not,
+        as the daemon has them now."""
+        try:
+            self._config.update(self._daemon.config())
+        except (DaemonUnavailableError, DaemonError):
+            pass
+        config = self._config
+        can_sleep = bool(config.get("can_sleep", True))
+        can_hibernate = bool(config.get("can_hibernate", True))
+        lids = power_offered(LID_ACTIONS, can_sleep, can_hibernate)
+        idles = power_offered(IDLE_ACTIONS, can_sleep, can_hibernate)
+        reason = None
+        if not can_sleep:
+            reason = words.CANNOT_SLEEP
+        elif not can_hibernate:
+            reason = {"secure_boot": words.NO_HIBERNATE_SECURE_BOOT,
+                      "no_swap": words.NO_HIBERNATE_NO_SWAP}.get(
+                          config.get("hibernate_reason"), words.NO_HIBERNATE)
+        return self._screen(
+            "panel_power", notice,
+            lid=power_shown(str(config.get("lid_action", LID_ACTIONS[0])), lids), lids=lids,
+            idle=power_shown(str(config.get("idle_action", IDLE_ACTIONS[0])), idles),
+            idles=idles,
+            idle_minutes=int(config.get("idle_sleep_minutes", IDLE_SLEEP_MINUTES)),
+            screen_off=self._screen_off_minutes(), reason=reason)
+
+    def set_lid(self, action: str) -> Screen:
+        """What closing the lid does: the daemon has logind take it at once."""
+        if action not in LID_ACTIONS:
+            return self.power(words.NOT_SAVED)
+        try:
+            result = self._guard(lambda: self._daemon.set_config(self._token,
+                                                                 {"lid_action": action}))
+        except Invalid:
+            return self.power(words.NOT_SAVED)
+        if isinstance(result, Screen):
+            return result
+        self._config["lid_action"] = action
+        return self.power(words.SAVED)
+
+    def set_idle_sleep(self, action: str, minutes: int) -> Screen:
+        """What a computer still left alone does, and after how many
+        minutes: a screen takes it the next time it starts."""
+        if action not in IDLE_ACTIONS:
+            return self.power(words.NOT_SAVED)
+        changes = {"idle_action": action, "idle_sleep_minutes": int(minutes)}
+        try:
+            result = self._guard(lambda: self._daemon.set_config(self._token, changes))
+        except Invalid:
+            return self.power(words.NOT_SAVED)
+        if isinstance(result, Screen):
+            return result
+        self._config.update(changes)
+        return self.power(words.APPLIES_NEXT_START)
+
     # --- advanced (D52) -----------------------------------------------------------
 
     def advanced(self, notice: str | None = None, draft: str | None = None) -> Screen:
@@ -1137,7 +1218,8 @@ PANEL_ACTIONS = {
     "panel_system": ("show_recovery", "save_adult_password", "set_language_keyboard",
                      "set_scale", "set_idle", "look_for_updates", "install_updates",
                      "poll_updates",
-                     "restart_now", "advanced", "tab", "close"),
+                     "restart_now", "advanced", "power", "tab", "close"),
+    "panel_power": ("set_lid", "set_idle_sleep", "tab", "close"),
     "panel_advanced": ("save_chromium_flags", "set_pointer", "set_statistics", "tab", "close"),
     "panel_network": ("refresh_network", "poll_network", "ask_wifi_password", "connect_wifi",
                       "ask_forget_wifi", "forget_wifi", "tab", "close"),

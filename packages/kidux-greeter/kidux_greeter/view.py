@@ -31,8 +31,8 @@ from .flow import FINAL, GRANT_CHOICES, Screen  # noqa: E402
 from .screen import only_progress_differs  # noqa: E402
 from . import laptop  # noqa: E402
 from .panel import (  # noqa: E402
-    IDLE_LOCK_MINUTES, IDLE_LOCK_RANGE, MODES, SCREEN_OFF_MINUTES, SCREEN_OFF_RANGE, parse_access,
-    size_label,
+    IDLE_LOCK_MINUTES, IDLE_LOCK_RANGE, IDLE_SLEEP_MINUTES, IDLE_SLEEP_RANGE, MODES,
+    SCREEN_OFF_MINUTES, SCREEN_OFF_RANGE, parse_access, size_label,
 )
 
 log = logging.getLogger("kidux.greeter")
@@ -1981,9 +1981,13 @@ class View:
                      self._button(words.SET, set_idle, text=self._(words.SET))):
             left_alone.append(part)
         self._field(grid, words.LEFT_ALONE, left_alone)
-        advanced = self._button(words.ADVANCED_OPEN, self._ask("advanced"),
-                                text=self._(words.ADVANCED_OPEN))
-        advanced.set_halign(Gtk.Align.START)
+        # Two pages of their own, the System page having no room left at
+        # 1280x800: the hardware's settings, and sleep and the lid (D119).
+        advanced = Gtk.Box(spacing=8, halign=Gtk.Align.START)
+        advanced.append(self._button(words.ADVANCED_OPEN, self._ask("advanced"),
+                                     text=self._(words.ADVANCED_OPEN)))
+        advanced.append(self._button(words.POWER_OPEN, self._ask("power"),
+                                     text=self._(words.POWER_OPEN)))
         self._field(grid, words.ADVANCED, advanced)
         middle.append(grid)
         self._focus = current
@@ -2131,6 +2135,68 @@ class View:
                 words.FORGET, self._ask("forget_wifi", asked["ssid"]), destructive=True,
                 text=self._(words.FORGET))))
         return box
+
+    def _draw_panel_power(self, screen, page, middle, bottom):
+        """Sleep and the lid (D119), reached from the System page: what
+        closing the lid does, saved when it is chosen; what a computer still
+        left alone does and after how many minutes, and Set; only what this
+        computer can do, and, when it cannot turn off saving, why."""
+        self._adult(page)
+        self._tab_bar(page, bottom, "system")
+        data = screen.data
+        middle.append(self._title(words.POWER))
+        middle.append(Gtk.Label(label=self._(words.POWER_EXPLAINED), wrap=True,
+                                max_width_chars=70, justify=Gtk.Justification.CENTER))
+        grid = self._form()
+        labels = {"sleep_then_hibernate": words.POWER_SLEEP_THEN_HIBERNATE,
+                  "sleep": words.POWER_SLEEP, "nothing": words.POWER_NOTHING,
+                  "screen_off_only": words.POWER_SCREEN_OFF_ONLY}
+
+        lids = list(data.get("lids") or [])
+        lid = self._dropdown([self._(labels[action]) for action in lids],
+                             lids.index(data["lid"]) if data.get("lid") in lids else 0)
+        lid.set_halign(Gtk.Align.START)
+
+        def lid_changed(*_args):
+            chosen = lid.get_selected()
+            if 0 <= chosen < len(lids) and lids[chosen] != data.get("lid"):
+                self.run("set_lid", lids[chosen])
+
+        lid.connect("notify::selected", lid_changed)
+        self._field(grid, words.LID_CLOSES, lid, hint=words.LID_HINT)
+
+        idles = list(data.get("idles") or [])
+        idle = self._dropdown([self._(labels[action]) for action in idles],
+                              idles.index(data["idle"]) if data.get("idle") in idles else 0)
+
+        def set_idle_sleep(*_args):
+            chosen = idle.get_selected()
+            if 0 <= chosen < len(idles):
+                self.run("set_idle_sleep", idles[chosen], int(minutes.get_value()))
+
+        least, most = IDLE_SLEEP_RANGE
+        minutes = self._spin(int(data.get("idle_minutes", IDLE_SLEEP_MINUTES)), most,
+                             set_idle_sleep, least=least)
+        still = Gtk.Box(spacing=8)
+        for part in (idle, Gtk.Label(label=self._(words.AFTER)), minutes,
+                     Gtk.Label(label=self._(words.MINUTES_SHORT)),
+                     self._button(words.SET, set_idle_sleep, text=self._(words.SET))):
+            still.append(part)
+        self._field(grid, words.STILL_LEFT_ALONE, still)
+        hint = Gtk.Label(label=self._(words.LEFT_ALONE_HINT).format(
+                             minutes=int(data.get("screen_off", SCREEN_OFF_MINUTES))),
+                         xalign=0.0, wrap=True, max_width_chars=60,
+                         css_classes=["kidux-field-label"])
+        grid.attach(hint, 1, grid.kidux_rows, 1, 1)
+        grid.kidux_rows += 1
+        for message in (words.POWER_WORDS, data.get("reason")):
+            if message:
+                note = Gtk.Label(label=self._(message), xalign=0.0, wrap=True,
+                                 max_width_chars=60, css_classes=["kidux-field-label"])
+                grid.attach(note, 1, grid.kidux_rows, 1, 1)
+                grid.kidux_rows += 1
+        middle.append(grid)
+        self._focus = lid
 
     def _draw_panel_advanced(self, screen, page, middle, bottom):
         """The settings that depend on the machine's hardware (D52), reached
