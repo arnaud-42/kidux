@@ -45,7 +45,7 @@ override_dh_auto_install:
 	install -D -m 0755 lib/labwc-rc $(DEST)/usr/lib/kidux/labwc-rc
 	install -D -m 0755 bin/kidux-lid-watch $(DEST)/usr/lib/kidux/kidux-lid-watch
 	install -D -m 0755 bin/kidux-idle $(DEST)/usr/lib/kidux/kidux-idle
-	install -D -m 0755 bin/kidux-hibernate-setup $(DEST)/usr/sbin/kidux-hibernate-setup
+	install -D -m 0755 bin/kidux-hibernate-setup $(DEST)/usr/lib/kidux/kidux-hibernate-setup
 	install -D -m 0644 plymouth/kidux.plymouth $(DEST)/usr/share/plymouth/themes/kidux/kidux.plymouth
 	install -D -m 0644 plymouth/kidux.script $(DEST)/usr/share/plymouth/themes/kidux/kidux.script
 	install -D -m 0644 plymouth/logo.png $(DEST)/usr/share/plymouth/themes/kidux/logo.png

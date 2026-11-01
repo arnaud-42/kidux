@@ -47,7 +47,7 @@ case "$1" in
         # Secure Boot, without room, or once done; it never fails the
         # installation, and makes the initramfs and GRUB's configuration
         # again itself when it changes them.
-        /usr/sbin/kidux-hibernate-setup || true
+        /usr/lib/kidux/kidux-hibernate-setup || true
         if command -v update-grub >/dev/null 2>&1 && [ -e /boot/grub/grub.cfg ]; then
             update-grub >/dev/null 2>&1 || true
         fi

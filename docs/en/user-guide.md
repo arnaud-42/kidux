@@ -1415,7 +1415,7 @@ When the page still warns, an administrator can do it again, and read
 why it did not, over SSH or a text login (above):
 
 ```sh
-sudo kidux-hibernate-setup
+sudo /usr/lib/kidux/kidux-hibernate-setup
 journalctl -t kidux-hibernate-setup
 ```
 

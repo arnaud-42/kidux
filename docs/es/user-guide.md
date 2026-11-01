@@ -1463,7 +1463,7 @@ Si la página sigue avisando, un administrador puede repetirlo y ver por
 qué no se hizo, por SSH o con una consola de texto (arriba):
 
 ```sh
-sudo kidux-hibernate-setup
+sudo /usr/lib/kidux/kidux-hibernate-setup
 journalctl -t kidux-hibernate-setup
 ```
 

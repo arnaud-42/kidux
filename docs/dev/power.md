@@ -146,7 +146,7 @@ found locked.
 
 ## 6. Making the computer able to hibernate
 
-`kidux-hibernate-setup`, in `kidux-session` at `/usr/sbin`, gives the
+`kidux-hibernate-setup`, `/usr/lib/kidux/kidux-hibernate-setup` of `kidux-session`, gives the
 computer what hibernating needs: a swap space as large as the memory, and
 the start after hibernating told where it is. `kidux-session`'s postinst
 runs it at every install and upgrade, and the installer runs it with
