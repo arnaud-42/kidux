@@ -6,6 +6,8 @@ kidux-daemon (0.3.39) trixie; urgency=medium
     file the daemon writes.
   * A child's session locks before the computer suspends, whatever
     suspends it.
+  * A session locked when the computer was turned off is not locked
+    again at the next sign-in.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:25:04 +0100
 

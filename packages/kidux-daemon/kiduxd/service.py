@@ -578,7 +578,7 @@ class Service:
             session_path=info["path"],
             scope=info.get("scope", ""),
             vtnr=int(info.get("vtnr", 0)),
-            lock=usage.lock if usage.active else "none",
+            lock=usage.lock if self._locked_this_boot(usage) else "none",
         )
         self.timekeeper.track(tracked)
         self._audit("session started", "ok", child=username, session=info["id"])
@@ -594,6 +594,15 @@ class Service:
             # session did, may have left the child's user manager frozen.
             self.locker.thaw_user_manager(tracked)
         self.on_timing_changed()
+
+    def _locked_this_boot(self, usage) -> bool:
+        """Whether a child's state says their session is active and locked
+        in this boot: the daemon started again under it. A state from
+        another boot is a computer turned off, or hung, under a session,
+        and the session now appearing is a new sign-in, which the password
+        has already let in. A state without a boot, written by a daemon
+        that kept none, counts as this boot's."""
+        return usage.active and usage.boot in ("", self.timekeeper.boot_id)
 
     def session_disappeared(self, session_id: str) -> None:
         tracked = self.timekeeper.find(session_id)

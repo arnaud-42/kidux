@@ -71,6 +71,9 @@ class Usage:
     seconds_used_today: int = 0
     active: bool = False
     lock: str = "none"
+    #: The boot the session was active in: a session found active and
+    #: locked in another boot is one the computer was turned off under.
+    boot: str = ""
 
     @classmethod
     def from_document(cls, document: dict) -> "Usage":
@@ -80,13 +83,14 @@ class Usage:
             seconds_used_today=int(document.get("seconds_used_today", 0)),
             active=bool(session.get("active", False)),
             lock=session.get("lock", "none"),
+            boot=str(session.get("boot", "")),
         )
 
     def as_document(self) -> dict:
         return {
             "last_day": self.last_day,
             "seconds_used_today": self.seconds_used_today,
-            "session": {"active": self.active, "lock": self.lock},
+            "session": {"active": self.active, "lock": self.lock, "boot": self.boot},
         }
 
 

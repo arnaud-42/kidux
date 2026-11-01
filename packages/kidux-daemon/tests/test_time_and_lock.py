@@ -754,6 +754,37 @@ def test_a_daemon_restart_while_locked_locks_again(h):
     assert h.service.timekeeper.sessions["ana"].lock == "time_up"
 
 
+def test_a_session_locked_when_the_computer_went_off_is_not_locked_at_the_next_sign_in(h):
+    # The computer suspended, then hung or lost its power, under Ana's
+    # locked session; at the next boot she signs in with her password.
+    h.policy(mode="daily", daily_minutes=60)
+    h.service.session_appeared(SESSION)
+    h.service.going_to_sleep()
+    h.machine.calls.clear()
+
+    h.build()
+    h.service.timekeeper.boot_id = "another-boot"
+    h.service.session_appeared(SESSION)
+
+    assert ("start_locker", "ana") not in h.machine.calls
+    assert h.service.timekeeper.sessions["ana"].lock == "none"
+
+
+def test_a_state_without_a_boot_counts_as_this_boot_s(h):
+    h.policy(mode="daily", daily_minutes=1)
+    h.service.session_appeared(SESSION)
+    h.play(60)
+    _, usage, _ = h.service.timekeeper.load("ana")
+    h.service.timekeeper.save("ana", h.service.timekeeper.load("ana")[0],
+                              usage.__class__(**{**usage.__dict__, "boot": ""}))
+    h.machine.calls.clear()
+
+    h.build()
+    h.service.timekeeper.boot_id = "another-boot"
+    h.service.session_appeared(SESSION)
+
+    assert ("start_locker", "ana") in h.machine.calls
+
 # --- secure attention (D16) --------------------------------------------------
 
 

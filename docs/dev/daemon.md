@@ -319,7 +319,16 @@ seconds_used_today = 0
 [session]
 active = false
 lock = "none"             # "none" | "time_up" | "requested" | "power_button" | "grace"
+                          # | "idle" | "lid" | "sleep"
+boot = ""                 # the boot the session is active in
 ```
+
+A daemon that starts again under a child's session finds it `active`, and
+locks it again with the same reason when it was locked. Only in the same
+boot, `/proc/sys/kernel/random/boot_id`: a state from another boot is a
+computer turned off, or hung, under a locked session, and the session that
+appears is a new sign-in, which the password has already let in. A state
+with no `boot` counts as this boot's.
 
 ### The accounting day
 

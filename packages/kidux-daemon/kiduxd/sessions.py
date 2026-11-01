@@ -17,6 +17,7 @@ costs at most one tick of counting.
 """
 
 from dataclasses import dataclass, field, replace
+from pathlib import Path
 from typing import Callable
 
 from kidux import paths, state
@@ -60,6 +61,14 @@ class Tracked:
         return self.lock != "none"
 
 
+def current_boot() -> str:
+    """The kernel's identifier of this boot, or "" when it cannot be read."""
+    try:
+        return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
+    except OSError:
+        return ""
+
+
 class Timekeeper:
     def __init__(
         self,
@@ -78,6 +87,9 @@ class Timekeeper:
         self._on_time_up = on_time_up
         self._on_grace_over = on_grace_over
         self.sessions: dict[str, Tracked] = {}
+        #: This boot's identifier, kept with a session's state: a lock is
+        #: put back on a session found again only in the boot it was put on.
+        self.boot_id = current_boot()
 
     # --- the files -------------------------------------------------------------
 
@@ -110,7 +122,8 @@ class Timekeeper:
 
     def set_session_state(self, username: str, active: bool, lock: str) -> None:
         policy, usage, _ = self.load(username)
-        self.save(username, policy, replace(usage, active=active, lock=lock))
+        self.save(username, policy, replace(usage, active=active, lock=lock,
+                                            boot=self.boot_id if active else ""))
 
     def left(self, username: str) -> int:
         policy, usage, _ = self.load(username)
