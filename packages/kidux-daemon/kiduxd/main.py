@@ -159,7 +159,7 @@ def serve(
             except Exception:
                 logger.exception("could not answer %s", source)
 
-        InputWatcher(Chords(attention)).start()
+        InputWatcher(Chords(attention, service.key_pressed)).start()
 
     def on_lost(connection, name):
         logger.error("lost the name %s, or never got it; exiting", name)

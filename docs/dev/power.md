@@ -63,7 +63,12 @@ is connected (`power.docked`: a connected DRM connector in
 locks every unlocked child's session with reason `lid`, then asks the
 switch again (`power.lid_is_closed`): opened in the meantime, nothing
 happens; still closed, it calls logind's `Suspend(false)`, audited as
-`suspend for the lid`. The same on battery and on mains power.
+`suspend for the lid`. The same on battery and on mains power. A key
+pressed since the close, on any keyboard the daemon reads, also stops it:
+nobody types on a closed laptop, and a switch that reads closed while
+someone does is one that lies, as the MacBook's read the lid inverted,
+closed when open and open when closed, after failed resumes; its
+"close" was the lid opening.
 
 Nothing else on a Kidux screen suspends for the lid. labwc has no lid handling
 of its own; the launcher (launcher.md section 5) and `kidux-lid-watch`

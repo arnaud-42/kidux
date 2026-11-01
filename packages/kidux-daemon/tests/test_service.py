@@ -1152,6 +1152,31 @@ def test_a_lid_opened_again_before_suspending_does_not_suspend(machine):
     assert machine.logind.slept == []
 
 
+def test_a_key_typed_with_the_lid_said_to_be_closed_is_a_switch_that_lies(machine):
+    # A MacBook's switch, after a failed resume, read closed with the lid
+    # open: the "close" was the lid opening, and the child types at once.
+    def closed_while_typing():
+        machine.service.key_pressed()
+        return True
+
+    machine.service.lid_is_closed = closed_while_typing
+    machine.service.connected_screens = lambda: []
+
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == []
+
+
+def test_a_key_pressed_before_the_lid_closed_does_not_count(machine):
+    machine.service.key_pressed()
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: []
+
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == ["Suspend"]
+
+
 def test_a_lid_closed_with_another_screen_connected_does_not_suspend(machine):
     machine.service.lid_is_closed = lambda: True
     machine.service.connected_screens = lambda: ["card1-eDP-1", "card1-HDMI-A-1"]

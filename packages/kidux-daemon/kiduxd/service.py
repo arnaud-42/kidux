@@ -139,6 +139,8 @@ class Service:
         #: replaced in the tests.
         self.lid_is_closed = power.lid_is_closed
         self.connected_screens = power.connected_screens
+        #: When a key was last pressed, on the clock's monotonic seconds.
+        self._last_key = float("-inf")
         if check_child_password is None:
             from .pamcheck import check_password as check_child_password
         self._check_child_password = check_child_password
@@ -933,11 +935,16 @@ class Service:
         """Whether this computer can suspend, as logind says now."""
         return power.can_sleep(self.logind.can("Suspend"))
 
+    def key_pressed(self) -> None:
+        """A key was pressed on a keyboard the daemon reads (attention.py)."""
+        self._last_key = self._clock.mono()
+
     def lid_closed(self) -> None:
         """The lid was seen to close (attention.py): the computer suspends,
         as the adult chose and it can, unless another screen is connected.
         A child's session locks first, and the lid is asked again after:
         opened in the meantime, nothing happens."""
+        closed_at = self._clock.mono()
         config = Config.load()
         if power.lid_action(config.lid_action, self.can_sleep()) != "sleep":
             return
@@ -952,6 +959,12 @@ class Service:
                     _log.exception("could not lock %s for the lid", tracked.username)
         if not self.lid_is_closed():
             _log.info("the lid opened again before suspending: not suspending")
+            return
+        if self._last_key >= closed_at:
+            # Nobody types on a closed laptop: a switch that reads closed
+            # while someone does is one that lies, as a MacBook's can after
+            # a failed resume, reading closed open and open closed.
+            _log.warning("a key was pressed with the lid said to be closed: not suspending")
             return
         _log.info("the lid closed: suspending")
         self._audit("suspend for the lid", "ok")

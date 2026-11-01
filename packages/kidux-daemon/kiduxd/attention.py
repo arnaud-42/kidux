@@ -44,8 +44,12 @@ INPUT_DIR = Path("/dev/input")
 class Chords:
     """Turns key events into "the power button" or "Ctrl+Alt+Escape"."""
 
-    def __init__(self, on_attention: Callable[[str], None]) -> None:
+    def __init__(self, on_attention: Callable[[str], None],
+                 on_key: Callable[[], None] = lambda: None) -> None:
         self._on_attention = on_attention
+        #: Called at every key pressed on a keyboard read here: a key typed
+        #: with the lid said to be closed is a lid switch that lies.
+        self._on_key = on_key
         # Held keys per device: a modifier on one keyboard and Escape on
         # another is not the chord.
         self._held: dict[str, set[int]] = {}
@@ -61,6 +65,7 @@ class Chords:
             return
 
         held.add(code)
+        self._on_key()
 
         if code == KEY_POWER:
             self._on_attention("power_button")

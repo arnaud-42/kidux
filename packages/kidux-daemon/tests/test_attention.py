@@ -34,6 +34,17 @@ def test_another_switch_is_not_the_lid():
     assert heard == []
 
 
+def test_every_key_pressed_is_told_and_a_release_is_not():
+    pressed = []
+    keys = Chords(lambda source: None, lambda: pressed.append(1))
+
+    keys.feed("kbd", KEY_ESC, 1)
+    keys.feed("kbd", KEY_ESC, 0)
+    keys.feed("kbd", KEY_ESC, 2)
+
+    assert pressed == [1]
+
+
 def test_the_lid_s_device_is_read():
     assert wanted(set(), {SW_LID})
     assert wanted({KEY_POWER})
