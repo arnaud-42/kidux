@@ -8,7 +8,10 @@ audit saying why. Two minutes more on
 the lock screen and it turns off; the child's session, frozen, turned
 nothing off. A key turns the lock screen on again, Leo continues, and the
 timer that ran out while the session was frozen does not lock it again.
-The settings go back to five and ten, and Leo logs out.
+Still left alone, a screen asks the daemon to sleep (D119): not while
+something holds idleness off, and otherwise the machine sleeps, Leo's
+session locked first, and wakes on the lock screen. The settings go back
+to five and ten, and Leo logs out.
 """
 
 import time
@@ -47,7 +50,7 @@ def run(machine: Machine) -> None:
     root(f"{AS} set-config idle_lock_minutes 1")
     root(f"{AS} set-config screen_off_minutes 2")
 
-    counting = "swayidle started (tty7, lock 60 s, screen off 120 s)"
+    counting = "swayidle started (tty7, lock 60 s, screen off 120 s, sleep 1200 s)"
     before = count(counting)
     password = machine.mark()
     machine.key("ret")                           # Leo, the first picture
@@ -94,6 +97,36 @@ def run(machine: Machine) -> None:
            back and active_terminal() == "tty7"
            and wait(lambda: count("swayidle started (tty7") > started, 10),
            active_terminal() + "\n" + idle_log())
+
+    # Still left alone, the screen asks the daemon to sleep, as kidux-idle's
+    # third timeout does (D119). Nothing while idleness is held off.
+    sleep_when_idle = ("busctl call org.kidux.Daemon1 /org/kidux/Daemon1 "
+                      "org.kidux.Daemon1.System1 SleepWhenIdle")
+    held = root(f"systemd-inhibit --what=idle --why=test sleep 30 & sleep 1; "
+                f"{sleep_when_idle}").stdout
+    report("a screen left alone while something holds idleness off does not sleep",
+           held.strip() == 's ""' and active_terminal() == "tty7", held)
+    time.sleep(30)
+
+    # Otherwise the machine sleeps, Leo's session locked first; QEMU's
+    # monitor wakes it.
+    root(f"({sleep_when_idle} >/dev/null 2>&1 &)", timeout=20)
+    asleep = wait(lambda: "suspended" in machine.monitor("info status"), 60, 2)
+    machine.monitor("system_wakeup")
+    report("otherwise the machine sleeps, the session locked before it",
+           asleep and wait(lambda: "PM: suspend exit" in root(
+               "journalctl -b -k -o cat | tail -40").stdout, 60, 3)
+           and audit_says("lock", "sleep") and active_terminal() == "tty8",
+           root("journalctl -b -o cat -t kidux-daemon | tail -5").stdout)
+    before = machine.mark()
+    machine.key("ctrl")
+    machine.shown("locked", before, 30)
+    before = machine.mark()
+    machine.key("ret")                           # Continue
+    machine.shown("child_password", before)
+    machine.type(CHILD_PASSWORD + "\n")
+    report("and on waking Leo continues with the password",
+           wait(lambda: active_terminal() == "tty7", 15), active_terminal())
 
     # The settings back as they were, and Leo logs out from the lock screen.
     root(f"{AS} set-config idle_lock_minutes 5")
