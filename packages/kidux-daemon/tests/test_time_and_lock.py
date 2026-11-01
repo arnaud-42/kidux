@@ -1001,3 +1001,34 @@ def test_a_child_may_not_ask_about_updates(h, updates):
     with pytest.raises(AccessDenied):
         h.call(ANA, "System1", "UpdateState")
 
+
+
+# --- sleep (D119) ------------------------------------------------------------
+
+
+def test_a_session_locks_before_the_computer_sleeps(h):
+    h.policy(mode="daily", daily_minutes=60)
+    h.service.session_appeared(SESSION)
+    h.play(300)
+
+    h.service.going_to_sleep()
+
+    assert ("Access1", "Locked", "(ss)", ("ana", "sleep")) in h.signals
+    h.play(900)
+    assert h.used() == 300                     # a closed lid is not a way out
+
+
+def test_a_session_already_locked_stays_as_it_is_when_the_computer_sleeps(h):
+    h.policy(mode="daily", daily_minutes=60)
+    h.service.session_appeared(SESSION)
+    h.call(ANA, "Access1", "LockFor", "lid")
+
+    h.service.going_to_sleep()
+
+    assert ("Access1", "Locked", "(ss)", ("ana", "sleep")) not in h.signals
+
+
+def test_sleeping_with_nobody_signed_in_locks_nothing(h):
+    h.service.going_to_sleep()
+
+    assert not [s for s in h.signals if s[1] == "Locked"]

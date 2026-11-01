@@ -1,3 +1,10 @@
+kidux-common (0.1.61) trixie; urgency=medium
+
+  * The paths of the power settings' files, and the words of the panel's
+    Sleep and lid page.
+
+ -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:25:04 +0100
+
 kidux-common (0.1.60) trixie; urgency=medium
 
   * Kidux is free software: GPL-3.0-or-later, in LICENSE and debian/copyright.

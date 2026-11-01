@@ -68,6 +68,7 @@ ACTIONS: dict[tuple[str, str], str | None] = {
     ("Modules1", "SignIn"): SELF,
     ("System1", "Shutdown"): None,
     ("System1", "Reboot"): None,
+    ("System1", "SleepWhenIdle"): SELF,
     ("System1", "CheckUpdates"): MANAGE,
     ("System1", "ApplyUpdates"): MANAGE,
     ("System1", "UpdateState"): SCREENS,

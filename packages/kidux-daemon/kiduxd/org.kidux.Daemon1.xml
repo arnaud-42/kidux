@@ -201,6 +201,9 @@
   <interface name="org.kidux.Daemon1.System1">
     <method name="Shutdown"/>
     <method name="Reboot"/>
+    <method name="SleepWhenIdle">
+      <arg name="done" type="s" direction="out"/>
+    </method>
     <method name="CheckUpdates">
       <arg name="token" type="s" direction="in"/>
     </method>

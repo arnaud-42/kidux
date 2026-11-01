@@ -26,8 +26,8 @@ from .access import (
     validate_policy, weekday_of,
 )
 from .adults import AdultPassword
-from .advanced import check_flags, write_flags, write_input
-from . import statistics
+from .advanced import check_flags, write_file, write_flags, write_input
+from . import power, statistics
 from .children import Children
 from .config import Config
 from .errors import (
@@ -57,7 +57,8 @@ MAX_GRACE_MINUTES = 15
 #: nothing may set it.
 SETTABLE = ("default_language", "default_keyboard", "display_scale", "setup_complete",
             "chromium_flags", "idle_lock_minutes", "screen_off_minutes", "save_minutes",
-            "pointer_speed", "scroll_speed", "apt_statistics")
+            "pointer_speed", "scroll_speed", "apt_statistics", "lid_action", "idle_action",
+            "idle_sleep_minutes")
 #: The minutes a session may be left alone before it locks, and before the
 #: screen turns off, as the panel offers them (D67).
 IDLE_LOCK_MINUTES = (1, 120)
@@ -205,6 +206,20 @@ class Service:
             "screen_off_minutes": int(config.screen_off_minutes),
             "save_minutes": int(config.save_minutes),
             "apt_statistics": bool(config.apt_statistics),
+            **self._power_config(config),
+        }
+
+    def _power_config(self, config: Config) -> dict:
+        """The power settings as chosen, and what this computer can do, for
+        the panel to offer only that and to say why (power.py, D119)."""
+        can = self.power_capabilities()
+        return {
+            "lid_action": str(config.lid_action),
+            "idle_action": str(config.idle_action),
+            "idle_sleep_minutes": int(config.idle_sleep_minutes),
+            "can_sleep": can.sleep,
+            "can_hibernate": can.hibernate,
+            "hibernate_reason": can.reason,
         }
 
     def Daemon1_SetConfig(self, caller: Caller, token: str, changes: dict) -> None:
@@ -246,8 +261,15 @@ class Service:
                     setattr(config, key, pointer.step(changes[key]))
                 except ValueError as error:
                     raise InvalidArgument(f"{key}: {error}") from error
+        for key, choices in (("lid_action", power.LID_ACTIONS),
+                             ("idle_action", power.IDLE_ACTIONS)):
+            if key in changes:
+                if changes[key] not in choices:
+                    raise InvalidArgument(f"{key} is one of {', '.join(choices)}")
+                setattr(config, key, changes[key])
         for key, (least, most) in (("idle_lock_minutes", IDLE_LOCK_MINUTES),
                                    ("screen_off_minutes", SCREEN_OFF_MINUTES),
+                                   ("idle_sleep_minutes", power.IDLE_SLEEP_MINUTES),
                                    ("save_minutes", (1, MAX_GRACE_MINUTES))):
             if key in changes:
                 minutes = changes[key]
@@ -264,6 +286,8 @@ class Service:
             write_input(config.pointer_speed, config.scroll_speed)
         if "apt_statistics" in changes:
             statistics.apply(config)
+        if "lid_action" in changes:
+            self.apply_power(config)
         self._audit("config set", "ok", caller=self._who(caller), fields=sorted(changes))
 
     # --- Parental1 -----------------------------------------------------------
@@ -890,6 +914,59 @@ class Service:
         self._audit("reboot", "ok", caller=self._who(caller))
         self.thaw_locked()
         self.logind.reboot()
+
+    # --- sleep and the lid (power.py, D119) ---------------------------------------
+
+    def power_capabilities(self) -> power.Capabilities:
+        """What this computer can do, as logind says now, and why not."""
+        answers = {f"Can{what}": self.logind.can(what)
+                   for what in ("Suspend", "Hibernate", "SuspendThenHibernate")}
+        return power.capabilities(answers, power.read(paths.LOCKDOWN), power.read(paths.SWAPS))
+
+    def apply_power(self, config: Config | None = None) -> None:
+        """logind's and systemd-sleep's files as the settings say, for what
+        this computer can do; logind reads its own again when it changed."""
+        config = config or Config.load()
+        can = self.power_capabilities()
+        version = power.systemd_version(self.logind.systemd_version())
+        write_file(paths.SLEEP_POWER, power.sleep_conf(config.hibernate_delay_seconds, version))
+        lid = power.lid_action(config.lid_action, can)
+        text = power.logind_conf(lid)
+        if power.read(paths.LOGIND_POWER) != text:
+            write_file(paths.LOGIND_POWER, text)
+            self.logind.reload()
+            _log.info("the lid: %s (chosen %s)", lid, config.lid_action)
+
+    def System1_SleepWhenIdle(self, caller: Caller) -> str:
+        """A screen left alone `idle_sleep_minutes` asks this (kidux-idle):
+        the computer sleeps, or sleeps and then turns off saving, as the
+        adult chose and as it can, unless something holds idleness or sleep
+        off, a video, a call, `systemd-inhibit --what=idle`. What it did, or
+        "" for nothing."""
+        config = Config.load()
+        action = power.idle_action(config.idle_action, self.power_capabilities())
+        method = power.IDLE_METHODS[action]
+        if method is None:
+            return ""
+        blocked = self.logind.block_inhibited()
+        for what in ("idle", "sleep"):
+            if power.inhibited(what, blocked):
+                _log.info("left alone, but %s is inhibited: not sleeping", what)
+                return ""
+        self._audit("sleep when idle", "ok", caller=self._who(caller), done=action)
+        self.logind.sleep(method)
+        return action
+
+    def going_to_sleep(self) -> None:
+        """The computer is about to sleep, whatever asked it to: every
+        unlocked child's session locks first, so that a closed lid is never
+        a way out of a time limit."""
+        for tracked in list(self.timekeeper.sessions.values()):
+            if not tracked.locked:
+                try:
+                    self._lock(tracked, "sleep")
+                except Failed:
+                    _log.exception("could not lock %s before sleeping", tracked.username)
 
     def thaw_locked(self) -> None:
         """Thaw every locked session's units, without unlocking, before the

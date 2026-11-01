@@ -13,7 +13,7 @@ from .attention import Chords, InputWatcher
 from .bus import BusObject
 from .gate import Gate, PolkitAuthority
 from .locker import Locker
-from .logind import SessionWatcher, SystemLogind
+from .logind import SessionWatcher, SleepGuard, SystemLogind
 from .machine import SystemMachine
 from .network import Network
 from .service import Service
@@ -76,6 +76,16 @@ def serve(
             statistics.apply(Config.load())
         except Exception:
             logger.exception("could not apply the usage statistics setting")
+
+    # logind's and systemd-sleep's files as config.toml has the power
+    # settings (power.py, D119): on every start, so that a machine upgraded
+    # from before the settings existed gets them with their defaults, and a
+    # computer that has since gained or lost the means to turn off saving
+    # does what it now can.
+    try:
+        service.apply_power()
+    except Exception:
+        logger.exception("could not apply the power settings")
 
     bus_object.register()
 
@@ -143,6 +153,13 @@ def serve(
         watcher.start()
         for info in watcher.existing():
             appeared(info)
+
+    # --- a child's session locks before the computer sleeps (D119) -------------
+    if watch_sessions:
+        def going_to_sleep():
+            service.going_to_sleep()
+
+        SleepGuard(connection, going_to_sleep).start()
 
     # --- the power button and Ctrl+Alt+Escape ------------------------------------
     if watch_input:
