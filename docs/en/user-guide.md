@@ -508,9 +508,8 @@ the sound (louder, quieter and mute) do what they say, inside any module.
 The corner of the child's screen shows the new level at once.
 
 Closing the lid locks the child's session and turns the screen and the
-keyboard's light off; then the computer suspends, and a minute later
-hibernates, as the adult panel's **Suspend and hibernate** page says
-(section 8). Opening the lid wakes it and turns the screen back on, with the light as
+keyboard's light off; then the computer suspends, as the adult panel's
+**Suspending the computer** page says (section 8). Opening the lid wakes it and turns the screen back on, with the light as
 bright as it was, on the lock screen, where the child types their
 password to carry on. Time does not count while the lid is closed.
 
@@ -831,52 +830,37 @@ computer needs: empty is what Kidux does on its own.
 
 ![Advanced: the pointer and Chromium's options](../images/en/panel-system-advanced.png)
 
-### Suspend and hibernate
+### Suspending the computer
 
-**Suspend and hibernate**, beside **Advanced** at the end of the System
+**Suspending the computer**, beside **Advanced** at the end of the System
 page, is for what the computer does when its lid closes, and when nobody
-uses it for a while:
+uses it for a while. Suspended, it uses a little battery, and comes back
+at once, where it was, when the lid opens or a key is pressed. Kidux never
+hibernates, that is, never saves its memory to the disk and turns off:
+on some computers the start after it cannot restore what was saved, and
+the computer no longer starts.
 
-- **Suspend**: little battery use, and the computer comes back at once,
-  where it was, when the lid opens or a key is pressed.
-- **Hibernate**: no battery use. The computer writes everything it has
-  open to its disk and turns off; turned on again, it starts where it
-  was, more slowly than from suspend. It needs a swap space on the disk
-  (below).
-
-**When the lid closes** can be **Suspend, then hibernate after a minute**,
-which is what Kidux does until you choose: closed for a moment, the
-computer comes back at once; closed for longer, it is off and uses
-nothing. Or **Suspend**, or **Nothing**: the lid only locks the session
-and turns the screen off. It does the same on the battery and plugged in.
+**When the lid closes** can be **Suspend**, which is what Kidux does
+until you choose, or **Nothing**: the lid only locks the session and
+turns the screen off. It does the same on the battery and plugged in.
 With another screen connected, closing the lid only turns the laptop's
 own screen off, and the computer stays on. The choice applies as soon as
 it is made.
 
 **Action when idle** is what happens when nobody touches the computer
-for some minutes, twenty to start with: **Suspend, then hibernate after a
-minute**, **Suspend**, or **Only turn the screen off**. Choose one and the
-minutes, then press **Set**. The sign-in and lock screens take it the
-next time they start, a child's session the next time the child signs
-in. The screen can turn off earlier: that is the **Left alone** row of
-the System page. Nothing happens while a video plays or a program asks
-the computer to stay on. Each screen counts its own minutes: a child's
-session left alone locks first, and the lock screen then counts from
-the start.
+for some minutes, twenty to start with: **Suspend**, or **Only turn the
+screen off**. Choose one and the minutes, then press **Set**. The sign-in
+and lock screens take it the next time they start, a child's session the
+next time the child signs in. The screen can turn off earlier: that is
+the **Left alone** row of the System page. Nothing happens while a video
+plays or a program asks the computer to stay on. Each screen counts its
+own minutes: a child's session left alone locks first, and the lock
+screen then counts from the start.
 
 Before the computer suspends, for any reason, a child's session locks,
-so that a child's time is never spent while the computer sleeps.
-
-Hibernating needs a swap space on the disk with room for what the
-computer holds in memory, and Secure Boot off in the computer's firmware
-settings, since with Secure Boot on Linux does not let a computer
-hibernate. The computer must also know, when it starts again, where its
-memory was saved. Kidux sets both up by itself, when it is installed and
-at every update, where the disk has room (section 11, **Making a swap
-space**). When this computer cannot hibernate, the page says so in a
-warning, and why; if you choose to hibernate anyway, the computer
-suspends instead. To make a swap space, see **Making a swap space** in
-section 11.
+so that a child's time is never spent while the computer sleeps. On a
+computer that cannot suspend, the page says so in a warning, and closing
+the lid or leaving it idle only locks it and turns the screen off.
 
 ### Network
 
@@ -1378,50 +1362,24 @@ computer is a door. To get one back for a repair:
 
 The text logins come back for that start only.
 
-### The computer does not suspend or hibernate
+### The computer does not suspend
 
 An administrator with a text login (above), or over SSH, can see what the
 computer can do and what it did:
 
 ```sh
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
-    org.freedesktop.login1.Manager CanSuspendThenHibernate
-cat /sys/kernel/security/lockdown     # anything but [none] is Secure Boot's
-cat /proc/swaps                       # a swap space on the disk, not zram
+    org.freedesktop.login1.Manager CanSuspend
 systemd-analyze cat-config systemd/logind.conf | grep -i lid
-cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
 systemd-inhibit --list                # what is keeping it on
-journalctl -b -1 | grep -i -e hibernat -e suspend
+journalctl -b | grep -i suspend
 ```
 
-`yes` to the first means it can suspend and then hibernate. The lid's
+`yes` or `challenge` to the first means it can suspend. The lid's
 setting is in `/etc/systemd/logind.conf.d/50-kidux-power.conf`, which the
 panel writes; a file there or in `/usr/lib/systemd/logind.conf.d/` whose
 name sorts after it, setting `HandleLidSwitch`, wins over it, and should be
-removed. `sudo systemctl hibernate` tries hibernating at once.
-
-### Making a swap space
-
-A computer hibernates into a swap space on its disk, as large as its
-memory, and starts again from it only if it knows where it is. Kidux
-makes both by itself, when it is installed, from the image or on Debian,
-and at every update: a swap file as large as the memory, on the system's
-partition, or on the one of `/home` when the system's has no room, always
-leaving 4 GB free; and the place of that file, given to the start. It
-does nothing with Secure Boot on, which forbids hibernating, or when
-neither partition has room.
-
-When the page still warns, an administrator can do it again, and read
-why it did not, over SSH or a text login (above):
-
-```sh
-sudo /usr/lib/kidux/kidux-hibernate-setup
-journalctl -t kidux-hibernate-setup
-```
-
-It says what it did, or why not: Secure Boot, or how many GB it needs
-and did not find. Once it has made the swap file, the computer can
-hibernate at once, and the warning on the page goes.
+removed.
 
 ### Taking Kidux off a computer
 

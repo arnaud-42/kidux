@@ -70,10 +70,10 @@ SCALES = (0.0, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0)
 #: defaults, and the ranges it accepts.
 IDLE_LOCK_MINUTES, SCREEN_OFF_MINUTES = 5, 10
 IDLE_LOCK_RANGE, SCREEN_OFF_RANGE = (1, 120), (1, 240)
-#: The Suspend and hibernate page's choices, as the daemon names them
+#: The Suspending the computer page's choices, as the daemon names them
 #: (D119), and the minutes a computer may be idle before it suspends.
-LID_ACTIONS = ("sleep_then_hibernate", "sleep", "nothing")
-IDLE_ACTIONS = ("sleep_then_hibernate", "sleep", "screen_off_only")
+LID_ACTIONS = ("sleep", "nothing")
+IDLE_ACTIONS = ("sleep", "screen_off_only")
 IDLE_SLEEP_MINUTES, IDLE_SLEEP_RANGE = 20, (1, 240)
 MODES = ("unlimited", "daily", "manual")
 
@@ -955,26 +955,19 @@ class Panel(_NewChild):
         self._restart_on_close = True
         return words.APPLIES_ON_CLOSE
 
-    # --- suspend and hibernate (D119) --------------------------------------------
+    # --- suspend (D119) ----------------------------------------------------------
 
     def power(self, notice: str | None = None) -> Screen:
-        """What closing the lid does, and what a computer idle does, as the
-        daemon has them now; every choice offered, and a warning when this
-        computer cannot do some of them, which the daemon does as the
-        nearest it can (power.md section 2)."""
+        """Whether closing the lid suspends the computer, and what a
+        computer idle does, as the daemon has them now; a warning when this
+        computer cannot suspend, which the daemon then does as nothing, or
+        the screen off only (power.md section 2)."""
         try:
             self._config.update(self._daemon.config())
         except (DaemonUnavailableError, DaemonError):
             pass
         config = self._config
-        warning = None
-        if not config.get("can_sleep", True):
-            warning = words.CANNOT_SLEEP
-        elif not config.get("can_hibernate", True):
-            warning = {"secure_boot": words.NO_HIBERNATE_SECURE_BOOT,
-                       "no_swap": words.NO_HIBERNATE_NO_SWAP,
-                       "no_resume": words.NO_HIBERNATE_NO_RESUME}.get(
-                           config.get("hibernate_reason"), words.NO_HIBERNATE)
+        warning = None if config.get("can_sleep", True) else words.CANNOT_SLEEP
         lid = str(config.get("lid_action", LID_ACTIONS[0]))
         idle = str(config.get("idle_action", IDLE_ACTIONS[0]))
         return self._screen(

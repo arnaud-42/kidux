@@ -17,7 +17,6 @@ Depends: ${misc:Depends},
          calamares,
          dosfstools,
          greetd,
-         kidux-session (>= 0.5.21~),
          live-boot,
          qt6-wayland,
 Description: Kidux's installer, for the live system of Kidux's image

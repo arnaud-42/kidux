@@ -2,12 +2,12 @@ kidux-session (0.5.21) trixie; urgency=medium
 
   * A screen still left alone after its screen has turned off asks the
     daemon to suspend the computer, as the adult chose on the panel's
-    Suspend and hibernate page; the lid is the daemon's to set, and logind
-    waits for a child's session to lock before the computer suspends.
-  * The computer is made able to hibernate at install and upgrade
-    (kidux-hibernate-setup): a swap file as large as the memory, where it
-    fits, and the start after hibernating told where it is; nothing under
-    Secure Boot or without room.
+    Suspending the computer page; the lid is the daemon's to set, and
+    logind waits for a child's session to lock before the computer
+    suspends.
+  * The computer never hibernates: systemd-sleep's configuration forbids
+    it, so that no key, program or setting can leave it at a start that
+    cannot restore what was saved.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100
 

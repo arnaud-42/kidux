@@ -123,25 +123,11 @@ INPUT_XML = Path(os.environ.get("KIDUX_INPUT_XML", "/etc/kidux/input.xml"))
 APT_STATISTICS = Path(os.environ.get("KIDUX_APT_STATISTICS",
                                      "/etc/apt/apt.conf.d/61kidux-statistics"))
 
-#: What logind does when the lid closes, from the panel's *Suspend and hibernate*
-#: page (kiduxd.power, D119): the daemon writes it, root's and 0644, and
-#: has logind read it again.
+#: What logind does when the lid closes, from the panel's *Suspending the computer* page
+#: (kiduxd.power, D119): the daemon writes it, root's and 0644, and has
+#: logind read it again.
 LOGIND_POWER = Path(os.environ.get("KIDUX_LOGIND_POWER",
                                    "/etc/systemd/logind.conf.d/50-kidux-power.conf"))
-#: How long a computer that suspends and then hibernates sleeps first
-#: (kiduxd.power): the daemon writes it, and systemd-sleep reads it at
-#: every sleep.
-SLEEP_POWER = Path(os.environ.get("KIDUX_SLEEP_POWER",
-                                  "/etc/systemd/sleep.conf.d/50-kidux-power.conf"))
-#: Where the kernel says whether it is locked down, which stops a computer
-#: saving its memory to disk, and which swap spaces it has: read to say why
-#: a computer cannot hibernate.
-LOCKDOWN = Path(os.environ.get("KIDUX_LOCKDOWN", "/sys/kernel/security/lockdown"))
-SWAPS = Path(os.environ.get("KIDUX_SWAPS", "/proc/swaps"))
-#: Whether a start after hibernating finds the memory saved: the resume
-#: device the kernel was given, on its command line or by the initramfs.
-RESUME = Path(os.environ.get("KIDUX_RESUME", "/sys/power/resume"))
-CMDLINE = Path(os.environ.get("KIDUX_CMDLINE", "/proc/cmdline"))
 
 # --- identities --------------------------------------------------------------
 

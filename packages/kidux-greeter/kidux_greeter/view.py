@@ -1982,7 +1982,7 @@ class View:
             left_alone.append(part)
         self._field(grid, words.LEFT_ALONE, left_alone)
         # Two pages of their own, the System page having no room left at
-        # 1280x800: the hardware's settings, and suspend and hibernate (D119).
+        # 1280x800: the hardware's settings, and suspending (D119).
         advanced = Gtk.Box(spacing=8, halign=Gtk.Align.START)
         advanced.append(self._button(words.ADVANCED_OPEN, self._ask("advanced"),
                                      text=self._(words.ADVANCED_OPEN)))
@@ -2137,18 +2137,16 @@ class View:
         return box
 
     def _draw_panel_power(self, screen, page, middle, bottom):
-        """Suspend and hibernate (D119), reached from the System page: what
-        closing the lid does, saved when it is chosen; what a computer idle
-        does and after how many minutes, and Set; what suspending and
-        hibernating are; and a warning when this computer cannot do some
-        of it, with the guide's address, selectable to copy."""
+        """Suspending (D119), reached from the System page: whether closing
+        the lid suspends, saved when it is chosen; what a computer idle does
+        and after how many minutes, and Set; what suspending is; and a
+        warning when this computer cannot suspend."""
         self._adult(page)
         self._tab_bar(page, bottom, "system")
         data = screen.data
         middle.append(self._title(words.POWER))
         grid = self._form()
-        labels = {"sleep_then_hibernate": words.POWER_SLEEP_THEN_HIBERNATE,
-                  "sleep": words.POWER_SLEEP, "nothing": words.POWER_NOTHING,
+        labels = {"sleep": words.POWER_SLEEP, "nothing": words.POWER_NOTHING,
                   "screen_off_only": words.POWER_SCREEN_OFF_ONLY}
 
         lids = list(data.get("lids") or [])
@@ -2182,18 +2180,12 @@ class View:
                      self._button(words.SET, set_idle_sleep, text=self._(words.SET))):
             when_idle.append(part)
         self._field(grid, words.IDLE_ACTION, when_idle, hint=words.IDLE_HINT)
-        lines = [self._(words.SUSPEND_EXPLAINED), self._(words.HIBERNATE_EXPLAINED)]
-        if data.get("warning"):
-            lines.append(self._(data["warning"]).format(url=self._(words.SWAP_GUIDE_URL)))
-        for number, line in enumerate(lines):
-            # The warning's address is long: it breaks anywhere, and can be
-            # selected with the pointer to copy it.
-            warning = number == 2
-            note = Gtk.Label(label=line, xalign=0.0, wrap=True, max_width_chars=60,
-                             wrap_mode=Pango.WrapMode.WORD_CHAR, selectable=warning,
-                             focusable=False, css_classes=["kidux-field-label"])
-            grid.attach(note, 1, grid.kidux_rows, 1, 1)
-            grid.kidux_rows += 1
+        for message in (words.SUSPEND_EXPLAINED, data.get("warning")):
+            if message:
+                note = Gtk.Label(label=self._(message), xalign=0.0, wrap=True,
+                                 max_width_chars=60, css_classes=["kidux-field-label"])
+                grid.attach(note, 1, grid.kidux_rows, 1, 1)
+                grid.kidux_rows += 1
         middle.append(grid)
         self._focus = lid
 

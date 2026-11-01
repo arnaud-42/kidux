@@ -381,9 +381,8 @@ which has not, and the keyboard's light after them; the first touch runs
 `kidux-idle screen on`, which gives the light back first, as it was. The
 screen's brightness is left alone, so a desktop's screen turns off as a
 laptop's does. After the third, `kidux-idle sleep` asks the daemon,
-`System1.SleepWhenIdle`, to put the computer to sleep, or to sleep and then
-hibernate, as the adult chose and the computer can, unless an idle
-inhibitor is held (power.md section 4).
+`System1.SleepWhenIdle`, to suspend the computer, as the adult chose and
+the computer can, unless an idle inhibitor is held (power.md section 4).
 
 `kidux-idle` counts only while its screen's terminal is the one in front:
 it reads its own from `XDG_VTNR`, which greetd and the lock screen's unit

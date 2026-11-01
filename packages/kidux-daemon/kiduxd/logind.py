@@ -47,8 +47,7 @@ class Logind(Protocol):
     def reboot(self) -> None: ...
     def can(self, what: str) -> str: ...
     def block_inhibited(self) -> str: ...
-    def sleep(self, method: str) -> None: ...
-    def systemd_version(self) -> str: ...
+    def suspend(self) -> None: ...
     def reload(self) -> None: ...
 
 
@@ -98,8 +97,8 @@ class SystemLogind:
         self._call("Reboot", GLib.Variant("(b)", (False,)))
 
     def can(self, what: str) -> str:
-        """logind's answer to `Can<what>`, "Suspend" or "Hibernate": "yes",
-        "no", "na" or "challenge"; "na" when it cannot be asked."""
+        """logind's answer to `Can<what>`, such as "Suspend": "yes", "no",
+        "na" or "challenge"; "na" when it cannot be asked."""
         try:
             return str(self._call(f"Can{what}", None, "(s)").unpack()[0])
         except Failed:
@@ -116,21 +115,9 @@ class SystemLogind:
             raise Failed(f"logind BlockInhibited failed: {error.message}") from error
         return str(reply.unpack()[0])
 
-    def sleep(self, method: str) -> None:
-        """`Suspend` or `SuspendThenHibernate`, not interactive."""
-        self._call(method, GLib.Variant("(b)", (False,)))
-
-    def systemd_version(self) -> str:
-        """The service manager's version, "257.13-1~deb13u1"; "" when it
-        cannot be asked."""
-        try:
-            reply = self._connection.call_sync(
-                SYSTEMD, SYSTEMD_PATH, "org.freedesktop.DBus.Properties", "Get",
-                GLib.Variant("(ss)", (SYSTEMD_MANAGER, "Version")),
-                GLib.VariantType("(v)"), Gio.DBusCallFlags.NONE, 10_000, None)
-        except GLib.Error:
-            return ""
-        return str(reply.unpack()[0])
+    def suspend(self) -> None:
+        """`Suspend`, not interactive."""
+        self._call("Suspend", GLib.Variant("(b)", (False,)))
 
     def reload(self) -> None:
         """logind reads its configuration again: SIGHUP to its main process,
@@ -208,11 +195,9 @@ class FakeLogind:
         self.powered_off = False
         self.rebooted = False
         #: logind's answers to Can*, as root would get them.
-        self.answers = {"CanSuspend": "yes", "CanHibernate": "yes",
-                        "CanSuspendThenHibernate": "yes"}
+        self.answers = {"CanSuspend": "yes"}
         self.blocked = ""
         self.slept: list[str] = []
-        self.version = "257.13-1~deb13u1"
         self.reloads = 0
 
     def sessions(self) -> list[SessionInfo]:
@@ -234,11 +219,8 @@ class FakeLogind:
     def block_inhibited(self) -> str:
         return self.blocked
 
-    def sleep(self, method: str) -> None:
-        self.slept.append(method)
-
-    def systemd_version(self) -> str:
-        return self.version
+    def suspend(self) -> None:
+        self.slept.append("Suspend")
 
     def reload(self) -> None:
         self.reloads += 1

@@ -77,11 +77,10 @@ def serve(
         except Exception:
             logger.exception("could not apply the usage statistics setting")
 
-    # logind's and systemd-sleep's files as config.toml has the power
-    # settings (power.py, D119): on every start, so that a machine upgraded
-    # from before the settings existed gets them with their defaults, and a
-    # computer that has since gained or lost the means to hibernate
-    # does what it now can.
+    # logind's lid file as config.toml has it (power.py, D119): on every
+    # start, so that a machine upgraded from before the setting existed gets
+    # it with its default, and a computer that has since gained or lost the
+    # means to suspend does what it now can.
     try:
         service.apply_power()
     except Exception:

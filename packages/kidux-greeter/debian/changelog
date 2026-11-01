@@ -1,9 +1,8 @@
 kidux-greeter (0.2.60) trixie; urgency=medium
 
-  * The panel's Suspend and hibernate page: what closing the lid does, and
-    the action when the computer is idle, suspend or suspend and then
-    hibernate, with a warning, and the guide's address for making a swap
-    space, when the computer cannot hibernate.
+  * The panel's Suspending the computer page: whether closing the lid
+    suspends the computer, and the action when it is idle, suspend or
+    only the screen off, with a warning when the computer cannot suspend.
   * A child's session is told when to ask the computer to suspend.
 
  -- Antonio Morales García <info@kidux.org>  Sat, 31 Oct 2026 14:26:45 +0100

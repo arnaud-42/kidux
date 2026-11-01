@@ -127,43 +127,21 @@ SPEED_STEPS = (N_("Much slower"), N_("Slower"), N_("Normal"), N_("Faster"), N_("
 POINTER_EXPLAINED = N_("On a touchpad, two fingers scroll the page; Normal scrolls half "
                        "as far as most computers do.")
 APPLIES_NEXT_SIGN_IN = N_("Saved. It applies the next time a child signs in.")
-#: The panel's Suspend and hibernate page (D119), in an adult's words:
-#: suspend keeps the computer's memory powered, hibernate saves it to the
-#: disk and turns the computer off.
-POWER_OPEN = N_("Suspend and hibernate")
-POWER = N_("Suspend and hibernate")
+#: The panel's Suspending the computer page (D119), in an adult's words: suspending keeps
+#: the computer's memory powered, and the computer comes back at once.
+POWER_OPEN = N_("Suspending the computer")
+POWER = N_("Suspending the computer")
 LID_CLOSES = N_("When the lid closes")
 LID_HINT = N_("With another screen connected, closing the lid only turns this screen off.")
 IDLE_ACTION = N_("Action when idle")
 IDLE_HINT = N_("The screen can turn off earlier: that is set on the System page.")
 AFTER = N_("after")
-POWER_SLEEP_THEN_HIBERNATE = N_("Suspend, then hibernate after a minute")
 POWER_SLEEP = N_("Suspend")
 POWER_NOTHING = N_("Nothing")
 POWER_SCREEN_OFF_ONLY = N_("Only turn the screen off")
 SUSPEND_EXPLAINED = N_("Suspend: little battery use, and the computer comes back at once.")
-HIBERNATE_EXPLAINED = N_("Hibernate: no battery use. It needs a swap space on the disk.")
-#: Where the guide, in the screen's language, says how to make a swap space.
-SWAP_GUIDE_URL = N_("https://github.com/othermore/kidux/blob/main/docs/en/user-guide.md"
-                    "#making-a-swap-space")
-NO_HIBERNATE_NO_SWAP = N_("Warning: this computer has no swap space, so hibernating will not "
-                          "work. If you choose to hibernate, the computer suspends instead. "
-                          "Kidux makes one where the disk has room; the guide says how to see "
-                          "why it did not: {url}")
-NO_HIBERNATE_NO_RESUME = N_("Warning: this computer does not know where to find its memory "
-                            "when it starts after hibernating, so hibernating will not work. "
-                            "If you choose to hibernate, the computer suspends instead. Kidux "
-                            "sets it where the disk has room; the guide says how to see why it "
-                            "did not: {url}")
-NO_HIBERNATE_SECURE_BOOT = N_("Warning: Secure Boot is on in this computer, and then Linux does "
-                              "not let it hibernate. If you choose to hibernate, the computer "
-                              "suspends instead.")
-NO_HIBERNATE = N_("Warning: hibernating does not work on this computer, often because its swap "
-                  "space is smaller than its memory. If you choose to hibernate, the computer "
-                  "suspends instead. The guide says how to see why: {url}")
-CANNOT_SLEEP = N_("Warning: this computer can neither suspend nor hibernate. Whatever you "
-                  "choose, closing the lid or leaving it idle only locks it and turns the "
-                  "screen off.")
+CANNOT_SLEEP = N_("Warning: this computer cannot suspend. Whatever you choose, closing the "
+                  "lid or leaving it idle only locks it and turns the screen off.")
 CHROMIUM_OPTIONS = N_("Chromium's options")
 CHROMIUM_OPTIONS_EXPLAINED = N_(
     "If a web module, Scratch for instance, or ScratchJr, which is Chromium inside, "

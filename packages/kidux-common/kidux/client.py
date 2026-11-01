@@ -360,9 +360,9 @@ class Client:
 
     def sleep_when_idle(self) -> str:
         """A screen left alone the minutes an adult chose: the computer
-        sleeps, or suspends and then hibernates, unless the adult chose
-        the screen off only or something holds idleness off (D119). What
-        the daemon did, "" for nothing."""
+        suspends, unless the adult chose the screen off only or something
+        holds idleness off (D119). What the daemon did, "sleep", or "" for
+        nothing."""
         return self.call("System1", "SleepWhenIdle").unpack()[0]
 
     def check_updates(self, token: str) -> None:

@@ -110,8 +110,7 @@ installer takes it off the installed system.
 - **The disk**: erased, with no manual layout. GPT and a 512 MiB EFI
   system partition under UEFI, MBR under a BIOS; the system, `kidux`, ext4,
   40 % of the disk between 16 and 64 GB; and `/home`, `kidux-home`, ext4,
-  the rest; swap as a file, which `kidux-hibernate-setup` then makes as
-  large as the memory and gives the resume device (power.md section 6).
+  the rest; swap as a file.
 - **The administrator**: a name, from which the login is suggested, the
   computer's name, `kidux` suggested, and a password, with `sudo` and no
   root password, as the Debian installer makes it. The *log in

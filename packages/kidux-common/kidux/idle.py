@@ -54,7 +54,7 @@ def sleep_seconds(config: dict) -> int:
     """The seconds a screen is left alone before the daemon is asked to put
     the computer to sleep, from the daemon's `GetConfig`: none when the
     adult chose the screen off only, or the computer cannot sleep."""
-    if config.get("idle_action", "sleep_then_hibernate") == "screen_off_only":
+    if config.get("idle_action", "sleep") == "screen_off_only":
         return 0
     if not config.get("can_sleep", True):
         return 0

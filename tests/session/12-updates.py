@@ -117,9 +117,8 @@ def daily_upgrade(machine: Machine) -> None:
     root(f"rm -f {STAND_IN} {RAN} && systemctl daemon-reload")
 
 
-def suspend_and_hibernate(machine: Machine) -> None:
-    """The System page's Suspend and hibernate (D119): on this machine,
-    which can suspend but has no swap to hibernate in, the lid's setting
+def suspending(machine: Machine) -> None:
+    """The System page's Suspending the computer (D119): the lid's setting
     suspends; Nothing chosen for the lid is written for logind at once."""
     open_panel(machine)
     machine.still()
@@ -136,7 +135,7 @@ def suspend_and_hibernate(machine: Machine) -> None:
     shown = machine.shown("panel_power", before, 10)
     machine.screenshot("panel-system-power")
     conf = "/etc/systemd/logind.conf.d/50-kidux-power.conf"
-    report("Suspend and hibernate, beside Advanced, has the lid suspend on this machine",
+    report("Suspending the computer, beside Advanced, has the lid suspend",
            shown and "HandleLidSwitch=suspend\n" in root(f"cat {conf}").stdout,
            greeter_log() + root(f"cat {conf}").stdout)
 
@@ -152,7 +151,7 @@ def suspend_and_hibernate(machine: Machine) -> None:
            and root(f"stat -c '%U %a' {conf}").stdout.strip() == "root 644",
            root(f"cat {conf}").stdout + root(f"tail -2 {AUDIT}").stdout)
     root("runuser -u debian -- /usr/local/bin/kidux-as set-config lid_action "
-         "'\"sleep_then_hibernate\"'")
+         "'\"sleep\"'")
     before = machine.mark()
     machine.key("esc")                           # the panel closes
     machine.shown("choose", before)
@@ -252,5 +251,5 @@ def run(machine: Machine) -> None:
     root("rm -f /etc/apt/sources.list.d/kidux-test-canary.list")
     machine.still()
 
-    suspend_and_hibernate(machine)
+    suspending(machine)
     daily_upgrade(machine)

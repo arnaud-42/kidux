@@ -7,7 +7,7 @@ DEST = debian/kidux-session
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	pyflakes3 bin/kidux-closed bin/kidux-idle bin/kidux-lid-watch bin/kidux-hibernate-setup lib/compositor lib/greeter-session lib/labwc-rc tests
+	pyflakes3 bin/kidux-closed bin/kidux-idle bin/kidux-lid-watch lib/compositor lib/greeter-session lib/labwc-rc tests
 	sh -n bin/kidux-session
 	sh -n lib/session-inner
 	python3 -B -m pytest -q -p no:cacheprovider tests
@@ -25,6 +25,7 @@ override_dh_auto_install:
 	install -D -m 0644 conf/getty-kidux.conf $(DEST)/usr/lib/systemd/system/getty@.service.d/kidux.conf
 	install -D -m 0644 conf/kidux-locker@.service $(DEST)/usr/lib/systemd/system/kidux-locker@.service
 	install -D -m 0644 conf/logind.conf $(DEST)/usr/lib/systemd/logind.conf.d/kidux.conf
+	install -D -m 0644 conf/sleep.conf $(DEST)/usr/lib/systemd/sleep.conf.d/kidux.conf
 	install -D -m 0644 conf/sysctl.conf $(DEST)/usr/lib/sysctl.d/60-kidux.conf
 	install -D -m 0644 conf/sshd.conf $(DEST)/etc/ssh/sshd_config.d/kidux.conf
 	install -D -m 0644 conf/40-kidux-children.rules $(DEST)/usr/share/polkit-1/rules.d/40-kidux-children.rules
@@ -45,7 +46,6 @@ override_dh_auto_install:
 	install -D -m 0755 lib/labwc-rc $(DEST)/usr/lib/kidux/labwc-rc
 	install -D -m 0755 bin/kidux-lid-watch $(DEST)/usr/lib/kidux/kidux-lid-watch
 	install -D -m 0755 bin/kidux-idle $(DEST)/usr/lib/kidux/kidux-idle
-	install -D -m 0755 bin/kidux-hibernate-setup $(DEST)/usr/lib/kidux/kidux-hibernate-setup
 	install -D -m 0644 plymouth/kidux.plymouth $(DEST)/usr/share/plymouth/themes/kidux/kidux.plymouth
 	install -D -m 0644 plymouth/kidux.script $(DEST)/usr/share/plymouth/themes/kidux/kidux.script
 	install -D -m 0644 plymouth/logo.png $(DEST)/usr/share/plymouth/themes/kidux/logo.png

@@ -751,13 +751,12 @@ off, and it is the daemon calling logind, not the child, so logind's own
 `power-off-multiple-sessions` policy does not get in the way.
 
 `SleepWhenIdle() → s`, the `self` class, is what `kidux-idle` asks when a
-screen is still left alone `idle_sleep_minutes`: logind's `Suspend(false)`
-or `SuspendThenHibernate(false)`, as `idle_action` says and the computer
-can, and nothing for the screen off only or while logind's
-`BlockInhibited` holds `idle` or `sleep`; it answers what it did, "" for
-nothing, and audits a sleep (power.md section 4). At every start the
-daemon writes logind's and systemd-sleep's power drop-ins and holds a
-delay lock on sleep, which locks every child's session before the
+screen is still left alone `idle_sleep_minutes`: logind's `Suspend(false)`,
+as `idle_action` says and the computer can, and nothing for the screen
+off only or while logind's `BlockInhibited` holds `idle` or `sleep`; it
+answers what it did, "sleep" or "" for nothing, and audits a suspend
+(power.md section 4). At every start the daemon writes logind's lid
+drop-in and holds a delay lock on sleep, which locks every child's session before the
 computer sleeps (power.md sections 3 and 5).
 
 `Versions() → a{sv}`, the `screens` class: every Kidux package dpkg has
@@ -929,8 +928,8 @@ names `kidux-daemon.service` as `SystemdService`.
   `display_scale`, `reset_hour`, `setup_complete`, `language_chosen`,
   `chromium_flags`, `pointer_speed`, `scroll_speed`, `idle_lock_minutes`,
   `screen_off_minutes`, `save_minutes`, `apt_statistics`, `lid_action`,
-  `idle_action`, `idle_sleep_minutes`, and what the computer can do,
-  `can_sleep`, `can_hibernate` and `hibernate_reason` (power.md). The
+  `idle_action`, `idle_sleep_minutes`, and `can_sleep`, whether the
+  computer can suspend (power.md). The
   trusted screens run as `_greetd`, which cannot read `config.toml`, and they
   need the scale and the language before they draw anything. `screens` class.
 - `Daemon1.SetConfig(token, changes a{sv})`, `manage` class: any of
@@ -942,10 +941,9 @@ names `kidux-daemon.service` as `SystemdService`.
   minutes a session may be left alone before it locks and before the screen
   turns off (D67), `save_minutes` (1 to 15), how long *Unlock to save*
   gives, which no page offers and the session tests set, and
-  `lid_action` (`sleep_then_hibernate`, `sleep` or `nothing`), written for
-  logind at once, `idle_action` (`sleep_then_hibernate`, `sleep` or
-  `screen_off_only`) and `idle_sleep_minutes` (1 to 240), the power
-  settings (power.md, D119),
+  `lid_action` (`sleep` or `nothing`), written for logind at once,
+  `idle_action` (`sleep` or `screen_off_only`) and `idle_sleep_minutes`
+  (1 to 240), the power settings (power.md, D119),
   `apt_statistics` (a boolean), whether every fetch of the archive carries
   an identifier of this machine's, `apt_statistics_id`, made once and kept:
   `/etc/apt/apt.conf.d/61kidux-statistics` written or removed at once

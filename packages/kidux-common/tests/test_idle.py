@@ -51,7 +51,7 @@ def test_a_screen_still_left_alone_asks_the_daemon_to_sleep():
 @pytest.mark.parametrize("config, seconds", [
     ({}, 1200),
     ({"idle_action": "sleep", "idle_sleep_minutes": 45, "can_sleep": True}, 2700),
-    ({"idle_action": "sleep_then_hibernate", "idle_sleep_minutes": 20}, 1200),
+    ({"idle_action": "sleep", "idle_sleep_minutes": 20}, 1200),
     ({"idle_action": "screen_off_only", "idle_sleep_minutes": 20}, 0),
     ({"idle_action": "sleep", "can_sleep": False}, 0),
 ])

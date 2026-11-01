@@ -210,16 +210,13 @@ class Service:
         }
 
     def _power_config(self, config: Config) -> dict:
-        """The power settings as chosen, and what this computer can do, for
-        the panel to warn when it cannot (power.py, D119)."""
-        can = self.power_capabilities()
+        """The power settings as chosen, and whether this computer can
+        suspend, for the panel to warn when it cannot (power.py, D119)."""
         return {
             "lid_action": str(config.lid_action),
             "idle_action": str(config.idle_action),
             "idle_sleep_minutes": int(config.idle_sleep_minutes),
-            "can_sleep": can.sleep,
-            "can_hibernate": can.hibernate,
-            "hibernate_reason": can.reason,
+            "can_sleep": self.can_sleep(),
         }
 
     def Daemon1_SetConfig(self, caller: Caller, token: str, changes: dict) -> None:
@@ -915,39 +912,36 @@ class Service:
         self.thaw_locked()
         self.logind.reboot()
 
-    # --- suspend and hibernate (power.py, D119) -----------------------------------
+    # --- suspend (power.py, D119) ------------------------------------------------
 
-    def power_capabilities(self) -> power.Capabilities:
-        """What this computer can do, as logind says now, and why not."""
-        answers = {f"Can{what}": self.logind.can(what)
-                   for what in ("Suspend", "Hibernate", "SuspendThenHibernate")}
-        return power.capabilities(answers, power.read(paths.LOCKDOWN), power.read(paths.SWAPS),
-                                  power.read(paths.RESUME), power.read(paths.CMDLINE))
+    def can_sleep(self) -> bool:
+        """Whether this computer can suspend, as logind says now."""
+        return power.can_sleep(self.logind.can("Suspend"))
 
     def apply_power(self, config: Config | None = None) -> None:
-        """logind's and systemd-sleep's files as the settings say, for what
-        this computer can do; logind reads its own again when it changed."""
+        """logind's file as the lid's setting says, for what this computer
+        can do; logind reads it again when it changed."""
         config = config or Config.load()
-        can = self.power_capabilities()
-        version = power.systemd_version(self.logind.systemd_version())
-        write_file(paths.SLEEP_POWER, power.sleep_conf(config.hibernate_delay_seconds, version))
-        lid = power.lid_action(config.lid_action, can)
+        lid = power.lid_action(config.lid_action, self.can_sleep())
         text = power.logind_conf(lid)
-        if power.read(paths.LOGIND_POWER) != text:
+        try:
+            written = paths.LOGIND_POWER.read_text()
+        except OSError:
+            written = ""
+        if written != text:
             write_file(paths.LOGIND_POWER, text)
             self.logind.reload()
             _log.info("the lid: %s (chosen %s)", lid, config.lid_action)
 
     def System1_SleepWhenIdle(self, caller: Caller) -> str:
         """A screen left alone `idle_sleep_minutes` asks this (kidux-idle):
-        the computer sleeps, or suspends and then hibernates, as the
-        adult chose and as it can, unless something holds idleness or sleep
-        off, a video, a call, `systemd-inhibit --what=idle`. What it did, or
-        "" for nothing."""
+        the computer suspends, as the adult chose and as it can, unless
+        something holds idleness or sleep off, a video, a call,
+        `systemd-inhibit --what=idle`. What it did, "sleep", or "" for
+        nothing."""
         config = Config.load()
-        action = power.idle_action(config.idle_action, self.power_capabilities())
-        method = power.IDLE_METHODS[action]
-        if method is None:
+        action = power.idle_action(config.idle_action, self.can_sleep())
+        if action != "sleep":
             return ""
         blocked = self.logind.block_inhibited()
         for what in ("idle", "sleep"):
@@ -955,7 +949,7 @@ class Service:
                 _log.info("left alone, but %s is inhibited: not sleeping", what)
                 return ""
         self._audit("sleep when idle", "ok", caller=self._who(caller), done=action)
-        self.logind.sleep(method)
+        self.logind.suspend()
         return action
 
     def going_to_sleep(self) -> None:

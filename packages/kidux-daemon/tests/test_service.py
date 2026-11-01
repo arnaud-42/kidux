@@ -1065,17 +1065,16 @@ def test_the_panel_turns_usage_statistics_off_and_on_and_the_snippet_follows(mac
         machine.call(GREETER, "Daemon1", "SetConfig", token, {"apt_statistics": "yes"})
 
 
-# --- sleep and the lid (power.py, D119) -----------------------------------------
+# --- suspend and the lid (power.py, D119) ---------------------------------------
 
 
 def test_the_power_settings_have_their_defaults_and_what_the_computer_can_do(machine):
     config = machine.call(GREETER, "Daemon1", "GetConfig")
 
     assert (config["lid_action"], config["idle_action"], config["idle_sleep_minutes"]) == \
-        ("sleep_then_hibernate", "sleep_then_hibernate", 20)
-    assert (config["can_sleep"], config["can_hibernate"], config["hibernate_reason"]) == \
-        (True, True, "")
-    assert "hibernate_delay_seconds" not in config
+        ("sleep", "sleep", 20)
+    assert config["can_sleep"] is True
+    assert not {"can_hibernate", "hibernate_reason"} & set(config)
 
 
 def test_a_config_from_before_the_power_settings_takes_their_defaults_and_keeps_its_own(
@@ -1086,33 +1085,21 @@ def test_a_config_from_before_the_power_settings_takes_their_defaults_and_keeps_
     config = machine.call(GREETER, "Daemon1", "GetConfig")
 
     assert (config["idle_lock_minutes"], config["screen_off_minutes"]) == (7, 25)
-    assert (config["lid_action"], config["idle_sleep_minutes"]) == ("sleep_then_hibernate", 20)
-    assert Config.load().hibernate_delay_seconds == 60
+    assert (config["lid_action"], config["idle_sleep_minutes"]) == ("sleep", 20)
 
 
-def test_a_computer_whose_start_would_not_resume_cannot_hibernate(machine, tmp_path):
-    (tmp_path / "resume").write_text("0:0\n")
+def test_a_computer_that_cannot_suspend_says_so(machine):
+    machine.logind.answers.update(CanSuspend="no")
 
-    config = machine.call(GREETER, "Daemon1", "GetConfig")
-
-    assert (config["can_hibernate"], config["hibernate_reason"]) == (False, "no_resume")
-    assert machine.call(ANA, "System1", "SleepWhenIdle") == "sleep"
-
-
-def test_a_computer_that_cannot_hibernate_says_why(machine, tmp_path):
-    machine.logind.answers.update(CanHibernate="na", CanSuspendThenHibernate="na")
-    (tmp_path / "lockdown").write_text("none [integrity] confidentiality\n")
-
-    config = machine.call(GREETER, "Daemon1", "GetConfig")
-
-    assert (config["can_sleep"], config["can_hibernate"], config["hibernate_reason"]) == \
-        (True, False, "secure_boot")
+    assert machine.call(GREETER, "Daemon1", "GetConfig")["can_sleep"] is False
 
 
 @pytest.mark.parametrize("change", [
+    {"lid_action": "sleep_then_hibernate"},
     {"lid_action": "hibernate"},
     {"lid_action": ""},
     {"lid_action": 1},
+    {"idle_action": "sleep_then_hibernate"},
     {"idle_action": "nothing"},
     {"idle_sleep_minutes": 0},
     {"idle_sleep_minutes": 241},
@@ -1130,21 +1117,20 @@ def test_the_power_settings_are_saved(machine):
     token = machine.unlock(GREETER)
 
     machine.call(GREETER, "Daemon1", "SetConfig", token,
-                 {"lid_action": "sleep", "idle_action": "screen_off_only",
+                 {"lid_action": "nothing", "idle_action": "screen_off_only",
                   "idle_sleep_minutes": 45})
 
     config = machine.call(GREETER, "Daemon1", "GetConfig")
     assert (config["lid_action"], config["idle_action"], config["idle_sleep_minutes"]) == \
-        ("sleep", "screen_off_only", 45)
+        ("nothing", "screen_off_only", 45)
 
 
 def test_the_lid_s_setting_is_written_for_logind_which_reads_it_again(machine):
     token = machine.unlock(GREETER)
 
-    machine.call(GREETER, "Daemon1", "SetConfig", token, {"lid_action": "sleep"})
+    machine.call(GREETER, "Daemon1", "SetConfig", token, {"lid_action": "nothing"})
 
-    assert "HandleLidSwitch=suspend\n" in paths.LOGIND_POWER.read_text()
-    assert "HibernateDelaySec=60s\n" in paths.SLEEP_POWER.read_text()
+    assert "HandleLidSwitch=ignore\n" in paths.LOGIND_POWER.read_text()
     assert machine.logind.reloads == 1
 
 
@@ -1152,39 +1138,46 @@ def test_logind_is_left_alone_when_its_file_does_not_change(machine):
     machine.service.apply_power()
     machine.service.apply_power()
 
-    assert "HandleLidSwitch=suspend-then-hibernate\n" in paths.LOGIND_POWER.read_text()
+    assert "HandleLidSwitch=suspend\n" in paths.LOGIND_POWER.read_text()
     assert machine.logind.reloads == 1
 
 
-def test_a_lid_set_to_hibernate_only_sleeps_on_a_computer_that_cannot(machine):
-    machine.logind.answers.update(CanSuspendThenHibernate="no")
+def test_a_hibernating_lid_kept_from_a_development_build_suspends(machine):
+    state.write(paths.CONFIG_FILE, {"lid_action": "sleep_then_hibernate"}, "config")
 
     machine.service.apply_power()
 
     assert "HandleLidSwitch=suspend\n" in paths.LOGIND_POWER.read_text()
-    assert Config.load().lid_action == "sleep_then_hibernate"     # kept as chosen
 
 
-def test_a_screen_left_alone_has_the_computer_sleep_then_hibernate(machine):
-    assert machine.call(ANA, "System1", "SleepWhenIdle") == "sleep_then_hibernate"
+def test_a_lid_set_to_suspend_does_nothing_on_a_computer_that_cannot(machine):
+    machine.logind.answers.update(CanSuspend="na")
 
-    assert machine.logind.slept == ["SuspendThenHibernate"]
+    machine.service.apply_power()
+
+    assert "HandleLidSwitch=ignore\n" in paths.LOGIND_POWER.read_text()
+    assert Config.load().lid_action == "sleep"     # kept as chosen
 
 
-def test_a_computer_that_cannot_hibernate_only_sleeps_when_left_alone(machine):
-    machine.logind.answers.update(CanHibernate="na")
-
-    assert machine.call(GREETER, "System1", "SleepWhenIdle") == "sleep"
+def test_a_screen_left_alone_has_the_computer_suspend(machine):
+    assert machine.call(ANA, "System1", "SleepWhenIdle") == "sleep"
 
     assert machine.logind.slept == ["Suspend"]
 
 
-def test_screen_off_only_never_sleeps(machine):
+def test_screen_off_only_never_suspends(machine):
     token = machine.unlock(GREETER)
     machine.call(GREETER, "Daemon1", "SetConfig", token, {"idle_action": "screen_off_only"})
 
     assert machine.call(ANA, "System1", "SleepWhenIdle") == ""
 
+    assert machine.logind.slept == []
+
+
+def test_a_computer_that_cannot_suspend_does_not_when_left_alone(machine):
+    machine.logind.answers.update(CanSuspend="no")
+
+    assert machine.call(ANA, "System1", "SleepWhenIdle") == ""
     assert machine.logind.slept == []
 
 

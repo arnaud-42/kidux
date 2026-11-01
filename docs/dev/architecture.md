@@ -98,7 +98,7 @@ Guided layout applied by the installer (GPT on both UEFI and BIOS machines):
 | ESP (UEFI) or BIOS boot | 512 MB / 1 MB | `/boot/efi` | Bootloader. |
 | system | 24 GB (min 16) | `/` | Debian + our packages. Formatted on reinstall. |
 | data | rest of disk | `/home` | Never formatted on reinstall. |
-| swap | file on `/`, or on `/home` where `/` has no room | — | As large as the memory, in whole GiB, so that the computer can hibernate; made by the installer and by `kidux-session` at every install and upgrade, `kidux-hibernate-setup` (D119, power.md). |
+| swap | file on `/` | — | Sized to RAM up to 4 GB, created by the installer (phase 2). |
 
 Both are ext4. Btrfs snapshots were considered and rejected for now (see decision log).
 
@@ -2071,35 +2071,31 @@ Taken while planning `phase-3-plan.md`, which explains each in its section 3.
   an Apple processor UTM emulates the PC, and the page asks for four
   cores, since two are too slow to use.
 
-- **D119 — A closed lid and a computer left alone suspend, and then
-  hibernate; a child's session locks before any sleep.** Decided
-  2026-10-31 by the owner. Closing the lid sleeps at once and, still closed
-  a minute later, hibernates (systemd's suspend-then-hibernate,
-  `HibernateDelaySec=60s`), on battery as on mains power, and does
-  nothing while docked or with another screen connected; a computer
-  still left alone `idle_sleep_minutes` (twenty) after its last touch
-  does the same, as the second stage after D67's screen off, unless an
-  idle inhibitor is held. The adult chooses each on the panel's *Suspend
-  and hibernate* page: suspend then hibernate, suspend, or nothing (for
-  the lid) or the screen off only (for idleness), in those words, which
-  the adult reading that page understands. Every choice is offered;
-  where logind says the computer cannot hibernate, the page warns why,
-  Secure Boot's lockdown or no swap, with the guide's address for making
-  a swap space, and a hibernating choice is done as suspend. logind handles the
-  lid from a drop-in the daemon writes, reloaded by SIGHUP, so
-  kidux-session's drop-in no longer has it ignore the lid; what kept a
+- **D119 — A closed lid and a computer left alone suspend, never
+  hibernate, and a child's session locks before any sleep.** Decided
+  2026-10-31 by the owner. Closing the lid suspends at once, on battery
+  as on mains power, and does nothing while docked or with another
+  screen connected; a computer still left alone `idle_sleep_minutes`
+  (twenty) after its last touch suspends too, as the second stage after
+  D67's screen off, unless an idle inhibitor is held. The adult chooses
+  each on the panel's *Suspending the computer* page: suspend or nothing
+  for the lid, suspend or the screen off only for idleness. logind
+  handles the lid from a drop-in the daemon writes, reloaded by SIGHUP,
+  so kidux-session's drop-in no longer has it ignore the lid; what kept a
   closed lid from being a way out of a time limit is now the daemon's
   delay inhibitor on sleep, which locks every child's session before any
   sleep, whatever caused it. The second stage goes through the daemon
   (`System1.SleepWhenIdle`), not logind's `IdleAction`, which needs an
   `IdleHint` from every session, and not the screens themselves, which
-  polkit does not let suspend. Kidux never changes Secure Boot. It makes
-  the computer able to hibernate where it can, at its installation and
-  at every upgrade, as the owner decided the same day once a MacBook
-  hibernated and started afresh: `kidux-hibernate-setup`, in
-  kidux-session's postinst and in a step of the installer, makes the swap
-  file as large as the memory and gives Debian's initramfs and the
-  kernel's command line the resume device and offset, and does nothing
-  under Secure Boot, without room, or once done; and logind's yes alone
-  is not taken for an answer, the resume device has to be set too
-  (power.md).
+  polkit does not let suspend.
+
+  Hibernation was designed first, suspend and then hibernate a minute
+  later, and dropped the same day after the owner's MacBook (two
+  graphics cards, Intel and AMD) hibernated and then hung at every start
+  trying to restore, until `noresume` was typed at GRUB's prompt. Whether
+  restoring works cannot be known before trying it, logind's
+  `CanHibernate` says yes all the same, and a family cannot be asked to
+  edit a boot line. So Kidux never hibernates: kidux-session's
+  `sleep.conf.d` sets `AllowHibernation`, `AllowSuspendThenHibernate`
+  and `AllowHybridSleep` to no, and Kidux never changes swap, the
+  kernel's command line or the initramfs (power.md).

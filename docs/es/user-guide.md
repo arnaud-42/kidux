@@ -523,9 +523,8 @@ dicen, dentro de cualquier módulo. La esquina de la pantalla del niño
 muestra el nuevo nivel al momento.
 
 Cerrar la tapa bloquea la sesión del niño y apaga la pantalla y la luz
-del teclado; después el ordenador se suspende, y al minuto hiberna, como
-dice la página **Suspensión e hibernación** del panel de adulto (sección
-8). Al abrir la tapa se enciende y la pantalla se enciende de
+del teclado; después el ordenador se suspende, como dice la página
+**Suspensión** del panel de adulto (sección 8). Al abrir la tapa se enciende y la pantalla se enciende de
 nuevo, con la luz tan fuerte como estaba, en la pantalla de bloqueo,
 donde el niño escribe su contraseña para seguir. El tiempo no cuenta
 mientras la tapa está cerrada.
@@ -863,54 +862,38 @@ hace por su cuenta.
 
 ![Avanzado: el puntero y las opciones de Chromium](../images/es/panel-system-advanced.png)
 
-### Suspensión e hibernación
+### Suspensión
 
-**Suspensión e hibernación**, junto a **Avanzado** al final de la página
-Sistema, es para lo que hace el ordenador al cerrar la tapa, y cuando
-nadie lo usa durante un rato:
+**Suspensión**, junto a **Avanzado** al final de la página Sistema, es
+para lo que hace el ordenador al cerrar la tapa, y cuando nadie lo usa
+durante un rato. Suspendido, gasta un poco de batería y se enciende al
+momento, donde estaba, al abrir la tapa o pulsar una tecla. Kidux nunca
+hiberna, es decir, nunca guarda la memoria en el disco para apagarse: en
+algunos ordenadores el arranque siguiente no consigue recuperarla, y el
+ordenador deja de arrancar.
 
-- **Suspensión**: gasto reducido de batería, y el ordenador se enciende
-  inmediatamente, donde estaba, al abrir la tapa o pulsar una tecla.
-- **Hibernación**: no gasta batería. El ordenador escribe en su disco
-  todo lo que tiene abierto y se apaga; al encenderlo de nuevo vuelve a
-  empezar donde estaba, algo más despacio que tras suspender. Requiere
-  espacio de intercambio (swap) en el disco (más abajo).
-
-**Al cerrar la tapa** puede ser **Suspender y, al minuto, hibernar**, que
-es lo que hace Kidux mientras no elijas otra cosa: cerrada un momento, el
-ordenador se enciende al momento; cerrada más rato, está apagado y no
-gasta nada. O **Suspender**, o **Nada**: la tapa solo bloquea la sesión y
-apaga la pantalla. Hace lo mismo con batería que enchufado. Con otra
+**Al cerrar la tapa** puede ser **Suspender**, que es lo que hace Kidux
+mientras no elijas otra cosa, o **Nada**: la tapa solo bloquea la sesión
+y apaga la pantalla. Hace lo mismo con batería que enchufado. Con otra
 pantalla conectada, cerrar la tapa solo apaga la pantalla del portátil,
 y el ordenador sigue encendido. La elección se aplica en cuanto se hace.
 
 **Acción tras inactividad** es lo que pasa cuando nadie toca el ordenador
-durante unos minutos, veinte para empezar: **Suspender y, al minuto,
-hibernar**, **Suspender** o **Solo apagar la pantalla**. Elige una y los
-minutos, y pulsa **Fijar**. Las pantallas de inicio y de bloqueo lo toman
-la próxima vez que empiezan, la sesión de un niño la próxima vez que el
-niño entra. La pantalla se puede apagar antes: se configura en la fila
-**Si se deja solo** de la página Sistema. No pasa nada mientras se
-reproduce un vídeo o un programa pide que el ordenador siga encendido.
-Cada pantalla cuenta sus propios minutos: la sesión de un niño que se
-deja sola se bloquea primero, y la pantalla de bloqueo cuenta entonces
-desde el principio.
+durante unos minutos, veinte para empezar: **Suspender** o **Solo apagar
+la pantalla**. Elige una y los minutos, y pulsa **Fijar**. Las pantallas
+de inicio y de bloqueo lo toman la próxima vez que empiezan, la sesión de
+un niño la próxima vez que el niño entra. La pantalla se puede apagar
+antes: se configura en la fila **Si se deja solo** de la página Sistema.
+No pasa nada mientras se reproduce un vídeo o un programa pide que el
+ordenador siga encendido. Cada pantalla cuenta sus propios minutos: la
+sesión de un niño que se deja sola se bloquea primero, y la pantalla de
+bloqueo cuenta entonces desde el principio.
 
 Antes de que el ordenador se suspenda, por lo que sea, la sesión de un
 niño se bloquea, así que el tiempo de un niño nunca se gasta mientras el
-ordenador está suspendido.
-
-Hibernar necesita un espacio de intercambio (swap) en el disco con sitio
-para lo que el ordenador tiene en memoria, y Secure Boot desactivado en
-los ajustes del firmware del ordenador, porque con Secure Boot activado
-Linux no deja hibernar. Además, el ordenador tiene que saber, al arrancar
-de nuevo, dónde guardó la memoria. Kidux prepara ambas cosas por su
-cuenta, al instalarse y en cada actualización, cuando el disco tiene sitio
-(sección 11, **Crear un espacio de intercambio (swap)**). Cuando este ordenador
-no puede hibernar, la página lo dice en un aviso, y por qué; si eliges
-hibernar de todos modos, el ordenador se suspende en su lugar. Para crear
-un espacio de swap, mira **Crear un espacio de intercambio (swap)** en la
-sección 11.
+ordenador está suspendido. En un ordenador que no puede suspenderse, la
+página lo dice en un aviso, y cerrar la tapa o dejarlo sin usar solo lo
+bloquea y apaga la pantalla.
 
 ### Red
 
@@ -1425,51 +1408,24 @@ hacer una reparación:
 
 Las consolas vuelven solo para ese arranque.
 
-### El ordenador no se suspende o no hiberna
+### El ordenador no se suspende
 
 Un administrador con una consola de texto (arriba), o por SSH, puede ver
 qué puede hacer el ordenador y qué hizo:
 
 ```sh
 busctl call org.freedesktop.login1 /org/freedesktop/login1 \
-    org.freedesktop.login1.Manager CanSuspendThenHibernate
-cat /sys/kernel/security/lockdown     # todo lo que no sea [none] es Secure Boot
-cat /proc/swaps                       # un swap en el disco, no zram
+    org.freedesktop.login1.Manager CanSuspend
 systemd-analyze cat-config systemd/logind.conf | grep -i lid
-cat /etc/systemd/sleep.conf.d/50-kidux-power.conf
 systemd-inhibit --list                # qué lo mantiene encendido
-journalctl -b -1 | grep -i -e hibernat -e suspend
+journalctl -b | grep -i suspend
 ```
 
-`yes` en la primera quiere decir que puede suspender y después hibernar.
-El ajuste de la tapa está en
-`/etc/systemd/logind.conf.d/50-kidux-power.conf`, que escribe el panel;
-un fichero allí o en `/usr/lib/systemd/logind.conf.d/` cuyo nombre vaya
-detrás en orden alfabético y fije `HandleLidSwitch` manda sobre él, y hay
-que quitarlo. `sudo systemctl hibernate` prueba a hibernar al momento.
-
-### Crear un espacio de intercambio (swap)
-
-Un ordenador hiberna en un espacio de intercambio (swap) de su disco, tan
-grande como su memoria, y solo vuelve a empezar desde él si sabe dónde
-está. Kidux crea ambas cosas por su cuenta, al instalarse, con la imagen o
-sobre Debian, y en cada actualización: un fichero de intercambio tan
-grande como la memoria, en la partición del sistema, o en la de `/home`
-si en la del sistema no cabe, dejando siempre 4 GB libres; y el sitio de
-ese fichero, para el arranque. No hace nada con Secure Boot activado, que
-no deja hibernar, ni cuando no cabe en ninguna de las dos particiones.
-
-Si la página sigue avisando, un administrador puede repetirlo y ver por
-qué no se hizo, por SSH o con una consola de texto (arriba):
-
-```sh
-sudo /usr/lib/kidux/kidux-hibernate-setup
-journalctl -t kidux-hibernate-setup
-```
-
-Dice lo que hizo, o por qué no: Secure Boot, o cuántos GB necesita y no
-encontró. En cuanto ha creado el fichero, el ordenador ya puede hibernar, y el
-aviso de la página desaparece.
+`yes` o `challenge` en la primera quiere decir que puede suspenderse. El
+ajuste de la tapa está en `/etc/systemd/logind.conf.d/50-kidux-power.conf`,
+que escribe el panel; un fichero allí o en
+`/usr/lib/systemd/logind.conf.d/` cuyo nombre vaya detrás en orden
+alfabético y fije `HandleLidSwitch` manda sobre él, y hay que quitarlo.
 
 ### Quitar Kidux de un ordenador
 

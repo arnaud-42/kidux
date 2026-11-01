@@ -35,14 +35,12 @@ DEFAULTS = {
     # needed and kept for good.
     "apt_statistics": True,
     "apt_statistics_id": "",
-    # What closing the lid does, what a computer still left alone this many
-    # minutes after its last touch does, and how long a computer that sleeps
-    # and then hibernates sleeps first, which no page offers (power.py,
-    # D119). A machine whose config.toml predates them takes these.
-    "lid_action": "sleep_then_hibernate",
-    "idle_action": "sleep_then_hibernate",
+    # What closing the lid does, and what a computer still left alone this
+    # many minutes after its last touch does (power.py, D119). A machine
+    # whose config.toml predates them takes these.
+    "lid_action": "sleep",
+    "idle_action": "sleep",
     "idle_sleep_minutes": 20,
-    "hibernate_delay_seconds": 60,
 }
 
 
@@ -65,7 +63,6 @@ class Config:
     lid_action: str
     idle_action: str
     idle_sleep_minutes: int
-    hibernate_delay_seconds: int
 
     @classmethod
     def load(cls) -> "Config":

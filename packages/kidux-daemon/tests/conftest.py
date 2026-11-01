@@ -41,18 +41,6 @@ def roots(tmp_path, monkeypatch):
     monkeypatch.setenv("KIDUX_INPUT_XML", str(tmp_path / "etc" / "input.xml"))
     monkeypatch.setenv("KIDUX_APT_STATISTICS", str(tmp_path / "etc" / "61kidux-statistics"))
     monkeypatch.setenv("KIDUX_LOGIND_POWER", str(tmp_path / "etc" / "logind-power.conf"))
-    monkeypatch.setenv("KIDUX_SLEEP_POWER", str(tmp_path / "etc" / "sleep-power.conf"))
-    # A computer with Secure Boot off and a swap partition, unless a test
-    # writes them otherwise.
-    (tmp_path / "lockdown").write_text("[none] integrity confidentiality\n")
-    (tmp_path / "swaps").write_text("Filename\tType\tSize\tUsed\tPriority\n"
-                                    "/dev/sda2 partition\t1000\t0\t-1\n")
-    monkeypatch.setenv("KIDUX_LOCKDOWN", str(tmp_path / "lockdown"))
-    monkeypatch.setenv("KIDUX_SWAPS", str(tmp_path / "swaps"))
-    (tmp_path / "resume").write_text("8:2\n")
-    (tmp_path / "cmdline").write_text("BOOT_IMAGE=/boot/vmlinuz root=UUID=x ro quiet\n")
-    monkeypatch.setenv("KIDUX_RESUME", str(tmp_path / "resume"))
-    monkeypatch.setenv("KIDUX_CMDLINE", str(tmp_path / "cmdline"))
     importlib.reload(paths)
     yield state_root
     monkeypatch.undo()
