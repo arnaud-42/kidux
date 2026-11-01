@@ -117,6 +117,48 @@ def daily_upgrade(machine: Machine) -> None:
     root(f"rm -f {STAND_IN} {RAN} && systemctl daemon-reload")
 
 
+def sleep_and_lid(machine: Machine) -> None:
+    """The System page's Sleep and lid (D119): on this machine, which can
+    sleep but has no swap to turn off saving in, only Sleep and Nothing,
+    and the line saying why; Nothing chosen for the lid is written for
+    logind at once."""
+    open_panel(machine)
+    machine.still()
+    for _ in range(5 + children_count() + 3):
+        machine.key("shift-tab")
+    before = machine.mark()
+    machine.key("ret")
+    machine.shown("panel_system", before, 10)
+    # From the current password, as for Advanced, and one more.
+    for _ in range(11):
+        machine.key("tab")
+    before = machine.mark()
+    machine.key("ret")
+    shown = machine.shown("panel_power", before, 10)
+    machine.screenshot("panel-system-power")
+    conf = "/etc/systemd/logind.conf.d/50-kidux-power.conf"
+    report("Sleep and lid, beside Advanced, offers what this machine can do",
+           shown and "HandleLidSwitch=suspend\n" in root(f"cat {conf}").stdout,
+           greeter_log() + root(f"cat {conf}").stdout)
+
+    # The lid's list has the focus: its last choice, Nothing.
+    machine.key("ret")
+    machine.still(2)
+    machine.key("end")
+    before = machine.mark()
+    machine.key("ret")
+    machine.shown("panel_power", before, 10)
+    report("choosing Nothing for the lid has logind ignore it, at once",
+           wait(lambda: "HandleLidSwitch=ignore\n" in root(f"cat {conf}").stdout, 10)
+           and root(f"stat -c '%U %a' {conf}").stdout.strip() == "root 644",
+           root(f"cat {conf}").stdout + root(f"tail -2 {AUDIT}").stdout)
+    root("runuser -u debian -- /usr/local/bin/kidux-as set-config lid_action "
+         "'\"sleep_then_hibernate\"'")
+    before = machine.mark()
+    machine.key("esc")                           # the panel closes
+    machine.shown("choose", before)
+
+
 def run(machine: Machine) -> None:
     made = root("/usr/local/bin/kidux-as canary")
     report("a package to update waits in a local repository", made.returncode == 0,
@@ -211,4 +253,5 @@ def run(machine: Machine) -> None:
     root("rm -f /etc/apt/sources.list.d/kidux-test-canary.list")
     machine.still()
 
+    sleep_and_lid(machine)
     daily_upgrade(machine)
