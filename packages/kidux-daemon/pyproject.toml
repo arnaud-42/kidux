@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kiduxd"
-version = "0.3.38"
+version = "0.3.39"
 description = "The Kidux daemon"
 requires-python = ">=3.13"
 

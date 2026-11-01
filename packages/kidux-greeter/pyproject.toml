@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kidux-greeter"
-version = "0.2.59"
+version = "0.2.60"
 description = "The Kidux sign-in and lock screens"
 requires-python = ">=3.13"
 
