@@ -22,8 +22,33 @@ NEITHER = Capabilities(False, False, power.UNSUPPORTED)
 
 # --- what the computer can do ---------------------------------------------------
 
-def test_a_computer_logind_says_yes_to_can_do_everything():
-    assert power.capabilities(YES, OPEN, SWAPS_DISK) == Capabilities(True, True, "")
+RESUMES = "8:2\n"
+CMDLINE = "BOOT_IMAGE=/boot/vmlinuz root=UUID=x ro quiet splash kidux.boot\n"
+
+
+def test_a_computer_logind_says_yes_to_and_that_resumes_can_do_everything():
+    assert power.capabilities(YES, OPEN, SWAPS_DISK, RESUMES, CMDLINE) == \
+        Capabilities(True, True, "")
+
+
+def test_a_computer_that_would_not_find_its_memory_after_hibernating_only_suspends():
+    # The MacBook of 2026-10-31: logind says yes on UEFI, but the
+    # initramfs has RESUME=none, and the start after hibernating began afresh.
+    can = power.capabilities(YES, OPEN, SWAPS_DISK, "0:0\n", CMDLINE)
+
+    assert can == Capabilities(True, False, power.NO_RESUME)
+
+
+@pytest.mark.parametrize("resume, cmdline, resumes", [
+    ("8:2", CMDLINE, True),
+    ("0:0", CMDLINE + " resume=UUID=abc resume_offset=34816", True),
+    ("0:0", CMDLINE, False),
+    ("", "", False),
+    ("8:2", CMDLINE + " noresume", False),
+    ("0:0", CMDLINE + " resume=none", False),
+])
+def test_whether_a_start_after_hibernating_finds_the_memory(resume, cmdline, resumes):
+    assert power.resumes(resume, cmdline) is resumes
 
 
 @pytest.mark.parametrize("answer", ["no", "na", "challenge", ""])
@@ -50,7 +75,7 @@ def test_without_swap_on_a_disk_the_reason_is_no_swap(swaps):
 
 
 def test_otherwise_the_reason_is_only_that_it_cannot():
-    can = power.capabilities({**YES, "CanHibernate": "no"}, OPEN, SWAPS_DISK)
+    can = power.capabilities({**YES, "CanHibernate": "no"}, OPEN, SWAPS_DISK, RESUMES, CMDLINE)
 
     assert can.reason == power.UNSUPPORTED
 

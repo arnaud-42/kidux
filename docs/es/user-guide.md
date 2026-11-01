@@ -903,8 +903,9 @@ ordenador está suspendido.
 Hibernar necesita un espacio de intercambio (swap) en el disco con sitio
 para lo que el ordenador tiene en memoria, y Secure Boot desactivado en
 los ajustes del firmware del ordenador, porque con Secure Boot activado
-Linux no deja hibernar. El instalador de Kidux crea un fichero de
-intercambio del tamaño de la memoria, hasta 4 GB. Cuando este ordenador
+Linux no deja hibernar. Además, el ordenador tiene que saber, al arrancar
+de nuevo, dónde guardó la memoria. El instalador de Kidux crea un fichero
+de intercambio del tamaño de la memoria, hasta 4 GB. Cuando este ordenador
 no puede hibernar, la página lo dice en un aviso, y por qué; si eliges
 hibernar de todos modos, el ordenador se suspende en su lugar. Para crear
 un espacio de swap, mira **Crear un espacio de intercambio (swap)** en la
@@ -1500,6 +1501,10 @@ Kidux; con Secure Boot activado nada de esto sirve.
 5. Reinicia el ordenador, abre **Suspensión e hibernación** en el panel
    de adulto y comprueba que el aviso ha desaparecido. `sudo systemctl
    hibernate` lo prueba al momento.
+
+Cuando la página avisa de que el ordenador no sabe dónde encontrar su
+memoria, el swap ya existe pero falta el paso 4: haz solo los pasos 4 y
+5.
 
 Un fichero de intercambio creado de nuevo, o movido, empieza en otro
 sitio del disco: después hay que repetir el paso 4.

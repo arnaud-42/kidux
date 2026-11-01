@@ -921,7 +921,8 @@ class Service:
         """What this computer can do, as logind says now, and why not."""
         answers = {f"Can{what}": self.logind.can(what)
                    for what in ("Suspend", "Hibernate", "SuspendThenHibernate")}
-        return power.capabilities(answers, power.read(paths.LOCKDOWN), power.read(paths.SWAPS))
+        return power.capabilities(answers, power.read(paths.LOCKDOWN), power.read(paths.SWAPS),
+                                  power.read(paths.RESUME), power.read(paths.CMDLINE))
 
     def apply_power(self, config: Config | None = None) -> None:
         """logind's and systemd-sleep's files as the settings say, for what

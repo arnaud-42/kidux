@@ -972,7 +972,8 @@ class Panel(_NewChild):
             warning = words.CANNOT_SLEEP
         elif not config.get("can_hibernate", True):
             warning = {"secure_boot": words.NO_HIBERNATE_SECURE_BOOT,
-                       "no_swap": words.NO_HIBERNATE_NO_SWAP}.get(
+                       "no_swap": words.NO_HIBERNATE_NO_SWAP,
+                       "no_resume": words.NO_HIBERNATE_NO_RESUME}.get(
                            config.get("hibernate_reason"), words.NO_HIBERNATE)
         lid = str(config.get("lid_action", LID_ACTIONS[0]))
         idle = str(config.get("idle_action", IDLE_ACTIONS[0]))

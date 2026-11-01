@@ -870,8 +870,9 @@ so that a child's time is never spent while the computer sleeps.
 Hibernating needs a swap space on the disk with room for what the
 computer holds in memory, and Secure Boot off in the computer's firmware
 settings, since with Secure Boot on Linux does not let a computer
-hibernate. Kidux's installer makes a swap file the size of the memory,
-up to 4 GB. When this computer cannot hibernate, the page says so in a
+hibernate. The computer must also know, when it starts again, where its
+memory was saved. Kidux's installer makes a swap file the size of the
+memory, up to 4 GB. When this computer cannot hibernate, the page says so in a
 warning, and why; if you choose to hibernate anyway, the computer
 suspends instead. To make a swap space, see **Making a swap space** in
 section 11.
@@ -1451,6 +1452,10 @@ installer formats it; Secure Boot must be off for any of it to work.
 5. Restart the computer, open **Suspend and hibernate** on the adult
    panel, and check that the warning has gone. `sudo systemctl
    hibernate` tries it at once.
+
+When the page warns that the computer does not know where to find its
+memory, the swap space is there but step 4 was never done: do steps 4
+and 5 alone.
 
 A swap file made anew, or moved, begins somewhere else on the disk: step 4
 has to be done again after it.

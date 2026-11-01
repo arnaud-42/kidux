@@ -41,6 +41,15 @@ last two are `yes`. When it cannot, the reason is, in this order:
   hibernate;
 - `no_swap`: `/proc/swaps` lists no swap space but zram, which cannot hold
   the memory while the computer is off;
+- `no_resume`: the start after hibernating would not look for the memory
+  saved: neither `resume=` on the kernel's command line nor a resume
+  device in `/sys/power/resume`, which Debian's initramfs sets when
+  `/etc/initramfs-tools/conf.d/resume` names one (`power.resumes`).
+  logind answers yes without it on a UEFI computer, where systemd writes
+  the `HibernateLocation` EFI variable, but only a systemd initrd reads
+  that variable; initramfs-tools starts afresh and the session is lost.
+  Debian's installer writes `RESUME=none` for a swap file. It is checked
+  even when logind says yes;
 - `unsupported`: anything else logind knows, such as a swap space smaller
   than the memory in use.
 

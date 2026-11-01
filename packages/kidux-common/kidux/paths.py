@@ -138,6 +138,10 @@ SLEEP_POWER = Path(os.environ.get("KIDUX_SLEEP_POWER",
 #: a computer cannot hibernate.
 LOCKDOWN = Path(os.environ.get("KIDUX_LOCKDOWN", "/sys/kernel/security/lockdown"))
 SWAPS = Path(os.environ.get("KIDUX_SWAPS", "/proc/swaps"))
+#: Whether a start after hibernating finds the memory saved: the resume
+#: device the kernel was given, on its command line or by the initramfs.
+RESUME = Path(os.environ.get("KIDUX_RESUME", "/sys/power/resume"))
+CMDLINE = Path(os.environ.get("KIDUX_CMDLINE", "/proc/cmdline"))
 
 # --- identities --------------------------------------------------------------
 

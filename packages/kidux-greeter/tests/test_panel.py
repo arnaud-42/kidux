@@ -1443,6 +1443,7 @@ def test_the_system_page_leads_to_suspend_and_hibernate(panel):
 
 @pytest.mark.parametrize("reason, message", [
     ("no_swap", words.NO_HIBERNATE_NO_SWAP),
+    ("no_resume", words.NO_HIBERNATE_NO_RESUME),
     ("secure_boot", words.NO_HIBERNATE_SECURE_BOOT),
     ("unsupported", words.NO_HIBERNATE),
 ])
@@ -1459,7 +1460,8 @@ def test_a_computer_that_cannot_hibernate_is_still_offered_it_with_a_warning(
 
 
 def test_the_warnings_about_swap_give_the_guide_s_address():
-    for message in (words.NO_HIBERNATE_NO_SWAP, words.NO_HIBERNATE):
+    for message in (words.NO_HIBERNATE_NO_SWAP, words.NO_HIBERNATE_NO_RESUME,
+                    words.NO_HIBERNATE):
         assert "{url}" in message
     assert words.SWAP_GUIDE_URL.endswith("#making-a-swap-space")
 

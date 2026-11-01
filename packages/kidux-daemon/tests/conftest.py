@@ -49,6 +49,10 @@ def roots(tmp_path, monkeypatch):
                                     "/dev/sda2 partition\t1000\t0\t-1\n")
     monkeypatch.setenv("KIDUX_LOCKDOWN", str(tmp_path / "lockdown"))
     monkeypatch.setenv("KIDUX_SWAPS", str(tmp_path / "swaps"))
+    (tmp_path / "resume").write_text("8:2\n")
+    (tmp_path / "cmdline").write_text("BOOT_IMAGE=/boot/vmlinuz root=UUID=x ro quiet\n")
+    monkeypatch.setenv("KIDUX_RESUME", str(tmp_path / "resume"))
+    monkeypatch.setenv("KIDUX_CMDLINE", str(tmp_path / "cmdline"))
     importlib.reload(paths)
     yield state_root
     monkeypatch.undo()

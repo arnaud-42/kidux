@@ -1090,7 +1090,16 @@ def test_a_config_from_before_the_power_settings_takes_their_defaults_and_keeps_
     assert Config.load().hibernate_delay_seconds == 60
 
 
-def test_a_computer_that_cannot_turn_off_saving_says_why(machine, tmp_path):
+def test_a_computer_whose_start_would_not_resume_cannot_hibernate(machine, tmp_path):
+    (tmp_path / "resume").write_text("0:0\n")
+
+    config = machine.call(GREETER, "Daemon1", "GetConfig")
+
+    assert (config["can_hibernate"], config["hibernate_reason"]) == (False, "no_resume")
+    assert machine.call(ANA, "System1", "SleepWhenIdle") == "sleep"
+
+
+def test_a_computer_that_cannot_hibernate_says_why(machine, tmp_path):
     machine.logind.answers.update(CanHibernate="na", CanSuspendThenHibernate="na")
     (tmp_path / "lockdown").write_text("none [integrity] confidentiality\n")
 
@@ -1156,13 +1165,13 @@ def test_a_lid_set_to_hibernate_only_sleeps_on_a_computer_that_cannot(machine):
     assert Config.load().lid_action == "sleep_then_hibernate"     # kept as chosen
 
 
-def test_a_screen_left_alone_has_the_computer_sleep_then_turn_off_saving(machine):
+def test_a_screen_left_alone_has_the_computer_sleep_then_hibernate(machine):
     assert machine.call(ANA, "System1", "SleepWhenIdle") == "sleep_then_hibernate"
 
     assert machine.logind.slept == ["SuspendThenHibernate"]
 
 
-def test_a_computer_that_cannot_turn_off_saving_only_sleeps_when_left_alone(machine):
+def test_a_computer_that_cannot_hibernate_only_sleeps_when_left_alone(machine):
     machine.logind.answers.update(CanHibernate="na")
 
     assert machine.call(GREETER, "System1", "SleepWhenIdle") == "sleep"

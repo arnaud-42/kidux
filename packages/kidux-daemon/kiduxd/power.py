@@ -34,8 +34,10 @@ IDLE_ACTIONS = ("sleep_then_hibernate", "sleep", "screen_off_only")
 IDLE_SLEEP_MINUTES = (1, 240)
 
 #: Why a computer cannot hibernate: Secure Boot's lockdown, no swap
-#: space on a disk to save its memory in, or something else logind knows.
-SECURE_BOOT, NO_SWAP, UNSUPPORTED = "secure_boot", "no_swap", "unsupported"
+#: space on a disk to save its memory in, no resume device for the start
+#: after it, or something else logind knows.
+SECURE_BOOT, NO_SWAP, NO_RESUME, UNSUPPORTED = ("secure_boot", "no_swap", "no_resume",
+                                                "unsupported")
 
 #: logind's `HandleLidSwitch=` for each lid action.
 LID_HANDLES = {"sleep_then_hibernate": "suspend-then-hibernate", "sleep": "suspend",
@@ -59,24 +61,44 @@ class Capabilities:
     reason: str = ""
 
 
-def capabilities(answers: dict[str, str], lockdown: str = "", swaps: str = "") -> Capabilities:
+def capabilities(answers: dict[str, str], lockdown: str = "", swaps: str = "",
+                 resume: str = "", cmdline: str = "") -> Capabilities:
     """The computer's capabilities from logind's answers, `CanSuspend`,
     `CanHibernate` and `CanSuspendThenHibernate` to the daemon, which is
     root: anything but "yes" is a no. `lockdown` is the kernel's
-    `/sys/kernel/security/lockdown`, `swaps` its `/proc/swaps`, read only to
-    say why."""
+    `/sys/kernel/security/lockdown`, `swaps` its `/proc/swaps`, read to say
+    why; `resume` its `/sys/power/resume` and `cmdline` its `/proc/cmdline`,
+    which say whether the start after hibernating finds the memory saved
+    (`resumes`): logind answers yes on a UEFI computer without it, and
+    Debian's initramfs then starts afresh, the session lost."""
     sleep = answers.get("CanSuspend") == "yes"
     hibernate = sleep and all(answers.get(name) == "yes"
                               for name in ("CanHibernate", "CanSuspendThenHibernate"))
-    if hibernate:
+    if hibernate and resumes(resume, cmdline):
         return Capabilities(True, True)
     if locked_down(lockdown):
         reason = SECURE_BOOT
     elif not has_disk_swap(swaps):
         reason = NO_SWAP
+    elif not resumes(resume, cmdline):
+        reason = NO_RESUME
     else:
         reason = UNSUPPORTED
     return Capabilities(sleep, False, reason)
+
+
+def resumes(resume: str, cmdline: str) -> bool:
+    """Whether a start after hibernating looks for the memory saved: the
+    kernel was given a resume device, `resume=` on its command line, or
+    the initramfs set one in `/sys/power/resume` ("8:2"), which it does
+    when `/etc/initramfs-tools/conf.d/resume` names one; "0:0" is none."""
+    words = (cmdline or "").split()
+    if "noresume" in words:
+        return False
+    if any(word.startswith("resume=") and word != "resume=none" for word in words):
+        return True
+    device = (resume or "").strip()
+    return bool(device) and device != "0:0"
 
 
 def locked_down(text: str) -> bool:

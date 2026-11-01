@@ -149,6 +149,10 @@ SWAP_GUIDE_URL = N_("https://github.com/othermore/kidux/blob/main/docs/en/user-g
 NO_HIBERNATE_NO_SWAP = N_("Warning: this computer has no swap space, so hibernating will not "
                           "work. If you choose to hibernate, the computer suspends instead. "
                           "The guide says how to make a swap space: {url}")
+NO_HIBERNATE_NO_RESUME = N_("Warning: this computer does not know where to find its memory "
+                            "when it starts after hibernating, so hibernating will not work. "
+                            "If you choose to hibernate, the computer suspends instead. The "
+                            "guide says how to set it, in its section on swap: {url}")
 NO_HIBERNATE_SECURE_BOOT = N_("Warning: Secure Boot is on in this computer, and then Linux does "
                               "not let it hibernate. If you choose to hibernate, the computer "
                               "suspends instead.")
