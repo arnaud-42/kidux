@@ -139,6 +139,9 @@ class Service:
         #: replaced in the tests.
         self.lid_is_closed = power.lid_is_closed
         self.connected_screens = power.connected_screens
+        #: Runs `run` after `seconds`, from the main loop, which first reads
+        #: what the keyboards sent meanwhile; at once here, GLib's in main.py.
+        self.later: Callable[[float, Callable[[], None]], None] = lambda seconds, run: run()
         #: When a key was last pressed, on the clock's monotonic seconds.
         self._last_key = float("-inf")
         if check_child_password is None:
@@ -942,8 +945,8 @@ class Service:
     def lid_closed(self) -> None:
         """The lid was seen to close (attention.py): the computer suspends,
         as the adult chose and it can, unless another screen is connected.
-        A child's session locks first, and the lid is asked again after:
-        opened in the meantime, nothing happens."""
+        A child's session locks first, and the lid is asked again a moment
+        later: opened in the meantime, nothing happens."""
         closed_at = self._clock.mono()
         config = Config.load()
         if power.lid_action(config.lid_action, self.can_sleep()) != "sleep":
@@ -957,6 +960,11 @@ class Service:
                     self._lock(tracked, "lid")
                 except Failed:
                     _log.exception("could not lock %s for the lid", tracked.username)
+        self.later(power.LID_SETTLE_SECONDS, lambda: self._suspend_for_lid(closed_at))
+
+    def _suspend_for_lid(self, closed_at: float) -> None:
+        """The lid closed at `closed_at` and the sessions are locked: suspend,
+        unless the lid is open again or a key was pressed since the close."""
         if not self.lid_is_closed():
             _log.info("the lid opened again before suspending: not suspending")
             return

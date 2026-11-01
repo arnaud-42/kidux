@@ -60,11 +60,14 @@ a close (`EV_SW`, `SW_LID`, value 1) is `Service.lid_closed`. It does
 nothing when the lid's action comes to `nothing`, or while another screen
 is connected (`power.docked`: a connected DRM connector in
 `/sys/class/drm` that is not the laptop's own eDP, LVDS or DSI panel). It
-locks every unlocked child's session with reason `lid`, then asks the
-switch again (`power.lid_is_closed`): opened in the meantime, nothing
-happens; still closed, it calls logind's `Suspend(false)`, audited as
-`suspend for the lid`. The same on battery and on mains power. A key
-pressed since the close, on any keyboard the daemon reads, also stops it:
+locks every unlocked child's session with reason `lid`, waits a second
+(`power.LID_SETTLE_SECONDS`, through `Service.later`, GLib's timeout: the
+lock blocks the main loop, and the keys typed meanwhile are read only
+after it), then asks the switch again (`power.lid_is_closed`): opened in
+the meantime, nothing happens; still closed, it calls logind's
+`Suspend(false)`, audited as `suspend for the lid`. The same on battery
+and on mains power. A key pressed since the close, on any keyboard the
+daemon reads, also stops it:
 nobody types on a closed laptop, and a switch that reads closed while
 someone does is one that lies, as the MacBook's read the lid inverted,
 closed when open and open when closed, after failed resumes; its
@@ -90,7 +93,7 @@ trusted screens): a child may not suspend through polkit, and the setting,
 the capability and the inhibitors are the daemon's to weigh. The daemon
 does nothing when the idle action comes to `screen_off_only`, or when
 logind's `BlockInhibited` holds `idle` or `sleep` (`systemd-inhibit
-x A video holds the compositor's idle inhibitor (the Wayland
+--what=idle`, a call). A video holds the compositor's idle inhibitor (the Wayland
 idle-inhibit protocol, which labwc and cage honour), so `swayidle` fires
 neither the screen off nor the sleep while it plays. logind's own
 `IdleAction=` is not used: it needs every session's `IdleHint`, which
@@ -100,20 +103,6 @@ Each screen counts its own minutes, from when it comes to the front: a
 child's session left alone locks after `idle_lock_minutes`, and the lock
 screen, which then has the front, counts its screen off and its sleep from
 there.
-
-## 5. Locking before any sleep
-
-Closing the lid must never be a way out of a time limit (D67). The daemon
-holds a delay inhibitor on sleep (`kiduxd.logind.SleepGuard`); when logind
-signals `PrepareForSleep(true)`, for the lid, idleness, a key or anything
-else, it locks every unlocked child's session with reason `sleep`, the
-lock of daemon.md section 10, and lets the inhibitor go, and takes a new
-one at `PrepareForSleep(false)`. `kidux-session`'s logind drop-in sets
-`InhibitDelayMaxSec=15`, as long as a lock can take: the lock screen's
-start and the switch to it. A locked session is not counted, so nothing is
-spent while the computer sleeps; the launcher's own lock for the lid
-(`LockFor("lid")`), which usually arrives first, finds it locked, or is
-found locked.
 
 ## 5. Locking before any sleep
 

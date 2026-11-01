@@ -28,6 +28,11 @@ IDLE_ACTIONS = ("sleep", "screen_off_only")
 #: The minutes after the last touch before a computer left alone suspends,
 #: as the panel offers them.
 IDLE_SLEEP_MINUTES = (1, 240)
+#: The seconds the daemon waits, once a child's session is locked for the
+#: lid, before it asks the switch again and suspends: the main loop reads
+#: meanwhile what the keyboards sent while the lock was taken, so that a
+#: key typed with the lid said to be closed is seen before the suspend.
+LID_SETTLE_SECONDS = 1.0
 
 
 

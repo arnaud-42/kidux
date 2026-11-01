@@ -159,6 +159,16 @@ def serve(
             except Exception:
                 logger.exception("could not answer %s", source)
 
+        def later(seconds, run):
+            def once():
+                try:
+                    run()
+                except Exception:
+                    logger.exception("could not finish answering the lid")
+                return False
+            GLib.timeout_add(int(seconds * 1000), once)
+
+        service.later = later
         InputWatcher(Chords(attention, service.key_pressed)).start()
 
     def on_lost(connection, name):

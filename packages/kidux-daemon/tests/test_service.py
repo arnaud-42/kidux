@@ -29,6 +29,7 @@ from kiduxd.errors import (
 from kiduxd.gate import Caller, Gate
 from kiduxd.logind import FakeLogind, SessionInfo
 from kiduxd.children import Children
+from kiduxd import power
 from kiduxd.service import Service
 from kiduxd.tokens import Tokens
 
@@ -1163,6 +1164,36 @@ def test_a_key_typed_with_the_lid_said_to_be_closed_is_a_switch_that_lies(machin
     machine.service.connected_screens = lambda: []
 
     machine.service.lid_closed()
+
+    assert machine.logind.slept == []
+
+
+def test_the_lid_s_suspend_waits_for_the_keyboards_to_be_read(machine):
+    # The lock blocks the main loop; a key typed meanwhile is read only
+    # after it, so the switch is asked again a moment later.
+    waited = []
+    machine.service.later = lambda seconds, run: waited.append((seconds, run))
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: []
+
+    machine.service.lid_closed()
+
+    assert machine.logind.slept == []
+    ((seconds, run),) = waited
+    assert seconds == power.LID_SETTLE_SECONDS
+    run()
+    assert machine.logind.slept == ["Suspend"]
+
+
+def test_a_key_read_while_the_sessions_locked_stops_the_lid_s_suspend(machine):
+    waited = []
+    machine.service.later = lambda seconds, run: waited.append(run)
+    machine.service.lid_is_closed = lambda: True
+    machine.service.connected_screens = lambda: []
+
+    machine.service.lid_closed()
+    machine.service.key_pressed()
+    waited[0]()
 
     assert machine.logind.slept == []
 
