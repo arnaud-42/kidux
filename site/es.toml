@@ -239,6 +239,8 @@ who = "Desarrollado por"
 email = "Correo electrónico"
 code = "Código y seguimiento de incidencias"
 code_text = "Kidux en GitHub"
+mastodon = "Mastodon"
+mastodon_text = "@kidux@fosstodon.org"
 
 [footer]
 rights = "© 2026"

@@ -306,7 +306,7 @@
       <h2>{{ contact.title }}</h2>
       <p>{{ contact.text }}</p>
     </div>
-    <div class="cards three">
+    <div class="cards four">
       <article class="card">
         <h3>{{ contact.who }}</h3>
         <p><a href="{{ site.owner_url }}">{{ site.owner }}</a></p>
@@ -318,6 +318,10 @@
       <article class="card">
         <h3>{{ contact.code }}</h3>
         <p><a href="{{ site.repository }}">{{ contact.code_text }}</a></p>
+      </article>
+      <article class="card">
+        <h3>{{ contact.mastodon }}</h3>
+        <p><a rel="me" href="{{ site.mastodon }}">{{ contact.mastodon_text }}</a></p>
       </article>
     </div>
   </div>

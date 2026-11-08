@@ -14,6 +14,9 @@ sponsors_button = "https://github.com/sponsors/othermore/button"
 owner = "Antonio Morales García"
 owner_url = "https://antonio.mg"
 email = "info@kidux.org"
+# Kidux's own Mastodon account; the page links it with rel="me", which
+# Mastodon reads to mark the site as verified on the profile.
+mastodon = "https://fosstodon.org/@kidux"
 
 # The installer, the newest release's image, by its name without a version
 # (docs/dev/image.md, section 6).
