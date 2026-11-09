@@ -19,6 +19,8 @@ XB-Kidux-Name-en: Simulations
 XB-Kidux-Description-en: Interactive maths and science experiments: explore numbers, forces, light, electricity, atoms, planets and life. Simulations by PhET Interactive Simulations, University of Colorado Boulder, under CC BY 4.0; Kidux is not connected with PhET.
 XB-Kidux-Name-es: Simulaciones
 XB-Kidux-Description-es: Experimentos interactivos de matemáticas y ciencia: explora números, fuerzas, luz, electricidad, átomos, planetas y vida. Simulaciones de PhET Interactive Simulations, Universidad de Colorado Boulder, bajo licencia CC BY 4.0; Kidux no tiene relación con PhET.
+XB-Kidux-Name-fr: Simulations
+XB-Kidux-Description-fr: Des expériences interactives de mathématiques et de sciences : explore les nombres, les forces, la lumière, l'électricité, les atomes, les planètes et le vivant. Simulations de PhET Interactive Simulations, Université du Colorado à Boulder, sous licence CC BY 4.0 ; Kidux n'a aucun lien avec PhET.
 XB-Kidux-Ages: 6-14
 Description: Kidux learning module: Simulations, PhET's science and maths experiments
  Kidux is a Debian derivative for a child's first computer. This learning

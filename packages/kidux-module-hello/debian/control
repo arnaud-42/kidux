@@ -24,6 +24,8 @@ XB-Kidux-Name-en: [Test] Hello
 XB-Kidux-Description-en: A first page to read, and a button to press.
 XB-Kidux-Name-es: [Prueba] Hola
 XB-Kidux-Description-es: Una primera página para leer, y un botón para pulsar.
+XB-Kidux-Name-fr: [Test] Bonjour
+XB-Kidux-Description-fr: Une première page à lire, et un bouton sur lequel appuyer.
 XB-Kidux-Ages: 4-8
 Description: Kidux learning module: Hello, a first page to read
  Kidux is a Debian derivative for a child's first computer. This learning

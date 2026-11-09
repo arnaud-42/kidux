@@ -38,13 +38,14 @@ from .screen import GRANT_CHOICES, Screen
 
 #: Each language's name in its own language, so an adult who reads only one
 #: of them finds it. Never translated.
-LANGUAGE_NAMES = {"es": "Español", "en": "English"}
+LANGUAGE_NAMES = {"es": "Español", "en": "English", "fr": "Français"}
 
 #: The layouts offered for each language, first the most likely, by the name
 #: an adult knows them by. The daemon accepts any layout name.
 KEYBOARDS = {
     "es": (("es", words.KEYBOARD_ES), ("latam", words.KEYBOARD_LATAM)),
     "en": (("us", words.KEYBOARD_US), ("gb", words.KEYBOARD_GB)),
+    "fr": (("fr", words.KEYBOARD_FR), ("be", words.KEYBOARD_BE), ("ca", words.KEYBOARD_CA)),
 }
 
 #: The parts of Kidux the System page lists under Kidux's version, each by

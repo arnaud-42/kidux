@@ -19,6 +19,8 @@ XB-Kidux-Name-en: [Test] Hello on the web
 XB-Kidux-Description-en: The first page again, as a web page, with a link that stays closed.
 XB-Kidux-Name-es: [Prueba] Hola en la web
 XB-Kidux-Description-es: Otra vez la primera página, como página web, con un enlace que sigue cerrado.
+XB-Kidux-Name-fr: [Test] Bonjour sur le Web
+XB-Kidux-Description-fr: La première page à nouveau, en page web, avec un lien qui reste fermé.
 XB-Kidux-Ages: 4-8
 XB-Kidux-Before: hello
 Description: Kidux learning module: Hello on the web, a first page as a web page

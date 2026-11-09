@@ -1,0 +1,39 @@
+# French translation for kidux-module-gmail.
+# Copyright (C) 2026 Antonio Morales Garcia
+# This file is distributed under the same license as the kidux-module-gmail package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kidux-module-gmail 0.1.0\n"
+"Report-Msgid-Bugs-To: info@kidux.org\n"
+"POT-Creation-Date: 2026-10-18 16:27+0200\n"
+"PO-Revision-Date: 2026-11-09 17:34-0500\n"
+"Last-Translator: Arnaud Duplessier <arnaud@quarantedeux.org>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Gmail"
+msgstr "Gmail"
+
+msgid ""
+"The Gmail website for a Google account, including one managed with Family "
+"Link. Requires internet; an adult signs in with the child the first time, "
+"and the session stays. Kidux is not connected with Google."
+msgstr ""
+"Le site de Gmail pour un compte Google, y compris un compte supervisé avec "
+"Family Link. Nécessite Internet ; un adulte se connecte avec l'enfant la "
+"première fois, et la session reste ouverte. Kidux n'a aucun lien avec "
+"Google."
+
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+msgid ""
+"The child's Google account. Gmail's sign-in page opens with it filled in."
+msgstr ""
+"Le compte Google de l'enfant. La page de connexion de Gmail s'ouvre avec "
+"ce compte déjà rempli."

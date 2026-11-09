@@ -19,6 +19,8 @@ XB-Kidux-Name-en: Gmail
 XB-Kidux-Description-en: The Gmail website for a Google account, including one managed with Family Link. Requires internet; an adult signs in with the child the first time, and the session stays. Kidux is not connected with Google.
 XB-Kidux-Name-es: Gmail
 XB-Kidux-Description-es: La web de Gmail para una cuenta de Google, también una supervisada con Family Link. Requiere internet; un adulto inicia sesión con el niño la primera vez, y la sesión se mantiene. Kidux no tiene ninguna relación con Google.
+XB-Kidux-Name-fr: Gmail
+XB-Kidux-Description-fr: Le site de Gmail pour un compte Google, y compris un compte supervisé avec Family Link. Nécessite Internet ; un adulte se connecte avec l'enfant la première fois, et la session reste ouverte. Kidux n'a aucun lien avec Google.
 XB-Kidux-Ages: 8-
 Description: Kidux learning module: Gmail, a door to Gmail's website
  Kidux is a Debian derivative for a child's first computer. This learning

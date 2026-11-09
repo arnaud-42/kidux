@@ -1,0 +1,29 @@
+# French translation for kidux-module-turbowarp.
+# Copyright (C) 2026 Antonio Morales Garcia
+# This file is distributed under the same license as the kidux-module-turbowarp package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kidux-module-turbowarp 0.1.0\n"
+"Report-Msgid-Bugs-To: info@kidux.org\n"
+"POT-Creation-Date: 2026-10-18 16:27+0200\n"
+"PO-Revision-Date: 2026-11-09 17:34-0500\n"
+"Last-Translator: Arnaud Duplessier <arnaud@quarantedeux.org>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "TurboWarp"
+msgstr "TurboWarp"
+
+msgid ""
+"A high-performance alternative to Scratch, with the same blocks and the "
+"same projects, compiled for smoother animations and games on a slower "
+"computer."
+msgstr ""
+"Une version de Scratch plus performante, avec les mêmes blocs et les mêmes "
+"projets, compilée pour des animations et des jeux plus fluides sur un "
+"ordinateur modeste."

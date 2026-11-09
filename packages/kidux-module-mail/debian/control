@@ -22,6 +22,8 @@ XB-Kidux-Name-en: Mail
 XB-Kidux-Description-en: A mailbox of the child's own in Thunderbird, with the account an adult gives: Gmail, Outlook, iCloud or any IMAP provider. A Google account managed with Family Link cannot sign in; the Gmail module is for those.
 XB-Kidux-Name-es: Correo
 XB-Kidux-Description-es: Un buzón de correo propio del niño en Thunderbird, con la cuenta que da un adulto: Gmail, Outlook, iCloud o cualquier proveedor IMAP. Una cuenta de Google supervisada con Family Link no puede entrar; para esas está el módulo Gmail.
+XB-Kidux-Name-fr: Messagerie
+XB-Kidux-Description-fr: Une boîte aux lettres à l'enfant dans Thunderbird, avec le compte qu'un adulte lui donne : Gmail, Outlook, iCloud ou n'importe quel fournisseur IMAP. Un compte Google supervisé avec Family Link ne peut pas s'y connecter ; le module Gmail est fait pour ceux-là.
 XB-Kidux-Ages: 8-
 Description: Kidux learning module: Mail, a child's own mailbox in Thunderbird
  Kidux is a Debian derivative for a child's first computer. This learning

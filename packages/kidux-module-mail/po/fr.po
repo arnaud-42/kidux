@@ -1,0 +1,69 @@
+# French translation for kidux-module-mail.
+# Copyright (C) 2026 Antonio Morales Garcia
+# This file is distributed under the same license as the kidux-module-mail package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kidux-module-mail 0.1.0\n"
+"Report-Msgid-Bugs-To: info@kidux.org\n"
+"POT-Creation-Date: 2026-10-18 16:27+0200\n"
+"PO-Revision-Date: 2026-11-09 17:34-0500\n"
+"Last-Translator: Arnaud Duplessier <arnaud@quarantedeux.org>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Mail"
+msgstr "Messagerie"
+
+msgid ""
+"A mailbox of the child's own in Thunderbird, with the account an adult "
+"gives: Gmail, Outlook, iCloud or any IMAP provider. A Google account "
+"managed with Family Link cannot sign in; the Gmail module is for those."
+msgstr ""
+"Une boîte aux lettres à l'enfant dans Thunderbird, avec le compte qu'un "
+"adulte lui donne : Gmail, Outlook, iCloud ou n'importe quel fournisseur "
+"IMAP. Un compte Google supervisé avec Family Link ne peut pas s'y "
+"connecter ; le module Gmail est fait pour ceux-là."
+
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+msgid ""
+"The child's email address. Mail finds the provider's servers from it by "
+"itself."
+msgstr ""
+"L'adresse e-mail de l'enfant. Messagerie en déduit seule les serveurs du "
+"fournisseur."
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "The name the child's messages are sent as."
+msgstr "Le nom sous lequel partent les messages de l'enfant."
+
+msgid "Incoming server"
+msgstr "Serveur entrant"
+
+msgid ""
+"Only for a provider Mail cannot find by itself: its IMAP server, such as "
+"imap.example.org."
+msgstr ""
+"Seulement pour un fournisseur que Messagerie ne trouve pas seule : son "
+"serveur IMAP, par exemple imap.example.org."
+
+msgid "Outgoing server"
+msgstr "Serveur sortant"
+
+msgid ""
+"Only for a provider Mail cannot find by itself: its SMTP server, such as "
+"smtp.example.org."
+msgstr ""
+"Seulement pour un fournisseur que Messagerie ne trouve pas seule : son "
+"serveur SMTP, par exemple smtp.example.org."
+
+msgid "Local Folders"
+msgstr "Dossiers locaux"

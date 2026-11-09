@@ -1,0 +1,138 @@
+# French translation for kidux-module-basic.
+# Copyright (C) 2026 Antonio Morales Garcia
+# This file is distributed under the same license as the kidux-module-basic package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kidux-module-basic 0.1.0\n"
+"Report-Msgid-Bugs-To: info@kidux.org\n"
+"POT-Creation-Date: 2026-10-18 16:27+0200\n"
+"PO-Revision-Date: 2026-11-09 17:34-0500\n"
+"Last-Translator: Arnaud Duplessier <arnaud@quarantedeux.org>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "BASIC"
+msgstr "BASIC"
+
+msgid ""
+"Learn the classic BASIC programming language with an interactive guide "
+"beside it: write programs, draw shapes, play sounds, and see your code run "
+"instantly."
+msgstr ""
+"Apprends le langage de programmation classique BASIC avec un guide "
+"interactif à côté : écris des programmes, dessine des formes, joue des "
+"sons et vois ton code s'exécuter tout de suite."
+
+msgid "Type it in for me"
+msgstr "Tape-le pour moi"
+
+msgid ""
+"A button under each program of the guide types it into the editor. Off, "
+"the child types every program."
+msgstr ""
+"Un bouton sous chaque programme du guide le tape dans l'éditeur. "
+"Désactivé, l'enfant tape lui-même chaque programme."
+
+msgid "Run"
+msgstr "Lancer"
+
+msgid "Run the program (Ctrl+Enter)"
+msgstr "Lancer le programme (Ctrl+Entrée)"
+
+msgid "Stop"
+msgstr "Arrêter"
+
+msgid "Stop the program (Escape)"
+msgstr "Arrêter le programme (Échap)"
+
+msgid "New"
+msgstr "Nouveau"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Open"
+msgstr "Ouvrir"
+
+msgid "The program"
+msgstr "Le programme"
+
+msgid "The screen"
+msgstr "L'écran"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "The program in the editor will be lost. Go on?"
+msgstr "Le programme de l'éditeur sera perdu. On continue ?"
+
+msgid "program"
+msgstr "programme"
+
+msgid "The program is running. Escape stops it."
+msgstr "Le programme tourne. Échap l'arrête."
+
+msgid "The program has ended."
+msgstr "Le programme est terminé."
+
+msgid "You stopped the program."
+msgstr "Tu as arrêté le programme."
+
+msgid "The program is in the editor. Press Run to see it."
+msgstr "Le programme est dans l'éditeur. Appuie sur Lancer pour le voir."
+
+#, python-brace-format
+msgid ""
+"Line {number} jumps to line {target}, and the program has no line {target}."
+msgstr ""
+"La ligne {number} saute à la ligne {target}, et le programme n'a pas de "
+"ligne {target}."
+
+#, python-brace-format
+msgid "BASIC does not understand line {number}."
+msgstr "BASIC ne comprend pas la ligne {number}."
+
+#, python-brace-format
+msgid "BASIC does not understand line {line} of the editor."
+msgstr "BASIC ne comprend pas la ligne {line} de l'éditeur."
+
+msgid ""
+"Something is missing at the end of the program: a NEXT for a FOR, perhaps, "
+"or a closing quote."
+msgstr ""
+"Il manque quelque chose à la fin du programme : le NEXT d'un FOR, "
+"peut-être, ou un guillemet fermant."
+
+msgid "A READ found no more DATA to read."
+msgstr "Un READ n'a plus trouvé de DATA à lire."
+
+msgid ""
+"The program stopped at a mistake BASIC cannot name. Look for a RETURN "
+"without its GOSUB, or a NEXT without its FOR."
+msgstr ""
+"Le programme s'est arrêté sur une erreur que BASIC ne sait pas nommer. "
+"Cherche un RETURN sans son GOSUB, ou un NEXT sans son FOR."
+
+#, python-brace-format
+msgid "The program stopped: {message}"
+msgstr "Le programme s'est arrêté : {message}"
+
+msgid "Back"
+msgstr "Précédent"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Chapters"
+msgstr "Chapitres"
+
+msgid "For the adult"
+msgstr "Pour l'adulte"

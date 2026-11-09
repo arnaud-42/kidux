@@ -69,6 +69,9 @@ KEYBOARD_ES = N_("Spanish (Spain)")
 KEYBOARD_LATAM = N_("Latin American")
 KEYBOARD_US = N_("English (US)")
 KEYBOARD_GB = N_("English (UK)")
+KEYBOARD_FR = N_("French (France)")
+KEYBOARD_BE = N_("Belgian")
+KEYBOARD_CA = N_("Canadian French")
 
 # --- the adult panel ----------------------------------------------------------
 
