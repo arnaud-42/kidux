@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://kidux.org/es/"><b>kidux.org</b></a> ·
-  <a href="README.md">English version</a>
+  <a href="README.md">English version</a> ·
+  <a href="README.fr.md">Version française</a>
 </p>
 <p align="center"><a href="https://github.com/sponsors/othermore"><img src="https://img.shields.io/badge/Donar-GitHub%20Sponsors-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Donar con GitHub Sponsors"></a></p>
 
@@ -10,7 +11,7 @@
 
 Con Kidux, cada menor dispone de un espacio digital que siente verdaderamente suyo: su nombre y su avatar en la pantalla de bienvenida, su propia contraseña personal y su idioma preferido. Al mismo tiempo, los adultos mantienen el control total: solo estarán disponibles los módulos de aprendizaje previamente autorizados, y únicamente durante el horario o tiempo diario que la familia decida.
 
-Kidux es software libre y gratuito para todos, en casa o en el colegio, y su código fuente está en GitHub para que cualquiera pueda estudiarlo, modificarlo y compartirlo. Está construido sobre una base sólida y probada de Debian, disponible en español y en inglés desde el primer día.
+Kidux es software libre y gratuito para todos, en casa o en el colegio, y su código fuente está en GitHub para que cualquiera pueda estudiarlo, modificarlo y compartirlo. Está construido sobre una base sólida y probada de Debian, disponible en español, en inglés y en francés.
 
 ## Lo que ve un niño
 
@@ -89,7 +90,7 @@ Hay dos formas de instalar Kidux, y una de probarlo antes:
 
 ## Documentación
 
-- [Manual de uso](docs/es/user-guide.md), también disponible [en inglés](docs/en/user-guide.md): guía completa sobre la instalación, el asistente de primer arranque y la descripción detallada de cada pantalla y función tanto para adultos como para niños.
+- [Manual de uso](docs/es/user-guide.md), también disponible [en inglés](docs/en/user-guide.md) y [en francés](docs/fr/user-guide.md): guía completa sobre la instalación, el asistente de primer arranque y la descripción detallada de cada pantalla y función tanto para adultos como para niños.
 - [Documentación para desarrolladores](docs/dev/README.md) (en inglés): especificaciones técnicas sobre la arquitectura de Kidux, el sistema de seguridad, el empaquetado deb y cómo crear nuevos módulos de aprendizaje.
 
 ## Apoyar a Kidux

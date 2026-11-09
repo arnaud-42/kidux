@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://kidux.org/"><b>kidux.org</b></a> ·
-  <a href="README.es.md">Versión en español</a>
+  <a href="README.es.md">Versión en español</a> ·
+  <a href="README.fr.md">Version française</a>
 </p>
 <p align="center"><a href="https://github.com/sponsors/othermore"><img src="https://img.shields.io/badge/Donate-GitHub%20Sponsors-EA4AAA?style=for-the-badge&logo=githubsponsors&logoColor=white" alt="Donate with GitHub Sponsors"></a></p>
 
@@ -10,7 +11,7 @@
 
 With Kidux, each child enjoys a personal digital space that genuinely feels like their own: their chosen avatar and name on the sign-in screen, their personal password, and their preferred language. At the same time, adults retain comprehensive control: children can only access authorized educational modules, and only during the daily hours or schedules set by their family.
 
-Kidux is free software, free for everyone, at home or at school, and all its source code is on GitHub for anyone to study, change and share. Built on a proven Debian foundation, it provides bilingual English and Spanish support from day one.
+Kidux is free software, free for everyone, at home or at school, and all its source code is on GitHub for anyone to study, change and share. Built on a proven Debian foundation, it speaks English, Spanish and French.
 
 ## What a child sees
 
@@ -89,7 +90,7 @@ There are two ways to install Kidux, and one to try it first:
 
 ## Documentation
 
-- [User guide](docs/en/user-guide.md), also available in [Spanish](docs/es/user-guide.md): comprehensive instructions covering installation, initial setup, and detailed explanations of every screen and setting for adults and children.
+- [User guide](docs/en/user-guide.md), also available in [Spanish](docs/es/user-guide.md) and [French](docs/fr/user-guide.md): comprehensive instructions covering installation, initial setup, and detailed explanations of every screen and setting for adults and children.
 - [Developer documentation](docs/dev/README.md) (in English): technical architecture specifications, security model details, Debian packaging guidelines, and instructions for creating new learning modules.
 
 ## Supporting Kidux
