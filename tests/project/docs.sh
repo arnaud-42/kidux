@@ -4,8 +4,9 @@
 #
 #   tests/project/docs.sh
 #
-# docs/en/ and docs/es/ hold the same files, by name (CLAUDE.md: the same
-# file names, always in sync). A picture a document shows is in
+# Every docs/<lang>/ holds the same files as docs/en/, by name (CLAUDE.md:
+# the same file names, always in sync); a language is a folder of docs/
+# other than dev/ and images/. A picture a document shows is in
 # docs/images/<lang>/, or is one the release run writes there
 # (tests/lib/doc-screenshots.txt), so that a document never shows a
 # picture nothing makes.
@@ -16,22 +17,27 @@ REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$REPO_ROOT"
 failed=0
 
+languages="$(for dir in docs/*/; do basename "$dir"; done | grep -vx 'dev\|images')"
+
 en="$(cd docs/en && find . -name '*.md' | sort)"
-es="$(cd docs/es && find . -name '*.md' | sort)"
-if [ "$en" != "$es" ]; then
-    echo "FAIL  docs/en and docs/es hold different files:" >&2
-    printf '%s\n' "$en" | sed 's/^/  en: /' >&2
-    printf '%s\n' "$es" | sed 's/^/  es: /' >&2
-    failed=$((failed + 1))
-else
-    echo "PASS  docs/en and docs/es hold the same files"
-fi
+for lang in $languages; do
+    [ "$lang" = en ] && continue
+    other="$(cd "docs/$lang" && find . -name '*.md' | sort)"
+    if [ "$en" != "$other" ]; then
+        echo "FAIL  docs/en and docs/$lang hold different files:" >&2
+        printf '%s\n' "$en" | sed 's/^/  en: /' >&2
+        printf '%s\n' "$other" | sed "s/^/  $lang: /" >&2
+        failed=$((failed + 1))
+    else
+        echo "PASS  docs/en and docs/$lang hold the same files"
+    fi
+done
 
 written="$(grep -v '^#' tests/lib/doc-screenshots.txt | awk 'NF == 2 { print $2 }')"
-for lang in en es; do
+for lang in $languages; do
     missing=""
     readme=README.md
-    [ "$lang" = es ] && readme=README.es.md
+    [ "$lang" = en ] || readme="README.$lang.md"
     for doc in $readme $(find docs/$lang -name '*.md'); do
         for picture in $(grep -o "images/$lang/[a-z0-9-]*\.png" "$doc" | sed "s|.*/||" | sort -u); do
             [ -f "docs/images/$lang/$picture" ] && continue
