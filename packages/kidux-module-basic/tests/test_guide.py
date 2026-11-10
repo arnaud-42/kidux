@@ -52,7 +52,7 @@ def test_the_page_holds_every_language_its_words_and_its_chapters(tmp_path):
 
     html = output.read_text()
     data = json.loads(html.split("const PAGES = ", 1)[1].split(";\n", 1)[0])
-    assert set(data) == {"en", "es"}
+    assert set(data) == {entry.name for entry in CONTENT.iterdir() if entry.is_dir()}
     assert data["es"]["words"]["run"] == "Ejecutar" and data["en"]["words"]["run"] == "Run"
     assert len(data["es"]["chapters"]) == len(data["en"]["chapters"]) >= 1
     for language in data.values():
@@ -121,6 +121,6 @@ def test_type_in_for_me_switched_off_hides_the_buttons_and_what_speaks_of_them()
 
     assert '.get("type_in") === "0"' in template and 'classList.add("no-type-in")' in template
     assert ".no-type-in .type-in, .no-type-in .type-in-note { display: none; }" in style
-    for language in ("en", "es"):
+    for language in ("en", "es", "fr"):
         assert "::: type-in" in (CONTENT / language / "01-hello.md").read_text()
 
