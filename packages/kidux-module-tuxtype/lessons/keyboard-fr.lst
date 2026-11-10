@@ -1,0 +1,91 @@
+# The French AZERTY keyboard for Kidux's lessons and games: each key, upper
+# and lower case, with the finger that types it and the key of the US
+# keyboard in the same place, as Tux Typing reads it (lessons/build.py): 0
+# to 3 the left hand's little, ring, middle and index fingers, 4 and 5 the
+# thumbs, 6 to 9 the right hand's index, middle, ring and little fingers.
+# Tux Typing places a key by its US one: the a where the US keyboard has
+# the q, the z on its w, the q on its a, the m on its semicolon, the w on
+# its z, the comma on its m. A capital is placed on the US key's capital,
+# or on what Shift gives there. é, è, ç and à are keys of their own on the
+# row of digits, and ù beside the m. A vowel with a circumflex is typed
+# with the dead key right of the p and then its vowel, and is placed on
+# its vowel. The space keeps the short form, its finger alone: Tux Typing
+# places it.
+0|A|Q
+0|a|q
+3|B|B
+3|b|b
+2|C|C
+2|c|c
+2|D|D
+2|d|d
+2|E|E
+2|e|e
+3|F|F
+3|f|f
+3|G|G
+3|g|g
+6|H|H
+6|h|h
+7|I|I
+7|i|i
+6|J|J
+6|j|j
+7|K|K
+7|k|k
+8|L|L
+8|l|l
+9|M|:
+9|m|;
+6|N|N
+6|n|n
+8|O|O
+8|o|o
+9|P|P
+9|p|p
+0|Q|A
+0|q|a
+3|R|R
+3|r|r
+1|S|S
+1|s|s
+3|T|T
+3|t|t
+6|U|U
+6|u|u
+3|V|V
+3|v|v
+0|W|Z
+0|w|z
+1|X|X
+1|x|x
+6|Y|Y
+6|y|y
+1|Z|W
+1|z|w
+5| 
+6|,|m
+7|;|,
+7|.|<
+8|:|.
+9|!|/
+1|É|@
+1|é|2
+6|È|&
+6|è|7
+8|Ç|(
+8|ç|9
+9|À|)
+9|à|0
+9|Ù|"
+9|ù|'
+0|Â|Q
+0|â|q
+2|Ê|E
+2|ê|e
+7|Î|I
+7|î|i
+8|Ô|O
+8|ô|o
+6|Û|U
+6|û|u

@@ -146,3 +146,34 @@ def test_a_word_list_the_games_could_not_use_fails_the_build(tmp_path, words, sa
     source = tomllib.loads((PACKAGE / "lessons" / "es.toml").read_text(encoding="utf-8"))
     table = lessons.keyboard_table(source)
     assert any(said in p for p in lessons.check_words(path, table)), lessons.check_words(path, table)
+
+
+def test_french_lessons_are_for_the_azerty_keyboard(tmp_path):
+    lessons.build(tmp_path)
+
+    french = tmp_path / "kidux-fr"
+    scripts = sorted(p.name for p in (french / "scripts").iterdir())
+    # The ten fingers' twelve, and three for é è, à ç ù and the circumflex.
+    assert len(scripts) == 15
+    assert scripts[0] == "Leçon 01 - q s d f.xml"
+    assert scripts[-1] == "Leçon 15 - accent circonflexe.xml"
+    assert (french / "settings.txt").read_text() == "theme_locale_name=fr_FR.UTF-8\n"
+    # Tux Typing's French theme has no pictures, so the theme takes none.
+    assert not (french / "images").exists()
+    # Each key on its US one: the a on the q, the m on the semicolon, the
+    # é on the 2, a vowel with a circumflex on its vowel.
+    table = set((french / "keyboard.lst").read_text(encoding="utf-8").splitlines())
+    assert {"0|a|q", "0|q|a", "1|z|w", "0|w|z", "9|m|;", "9|M|:", "6|,|m",
+            "1|é|2", "6|è|7", "8|ç|9", "9|à|0", "9|ù|'", "2|ê|e", "5| "} <= table
+
+
+def test_french_games_get_kidux_s_word_lists_with_their_accents(tmp_path):
+    lessons.build(tmp_path)
+
+    words = tmp_path / "kidux-fr" / "words"
+    assert not words.is_symlink()
+    lists = {p.name: p.read_text(encoding="utf-8").splitlines() for p in words.iterdir()}
+    assert len(lists) == 7
+    every = {word for lines in lists.values() for word in lines[1:]}
+    assert {"ÉLÉPHANT", "FORÊT", "GARÇON", "OÙ", "ZÈBRE"} <= every
+    assert "FEVRIER" not in every and "ELEPHANT" not in every

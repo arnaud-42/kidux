@@ -15,7 +15,7 @@
 
 En los juegos de Tux Typing, el menor debe teclear letras sueltas o palabras completas a medida que caen del cielo antes de que toquen el suelo, permitiendo a Tux alimentarse o defender su territorio. Conforme se avanza de fase, la velocidad de caída aumenta de forma gradual y las palabras se vuelven más complejas.
 
-El juego está adaptado al idioma preferido del niño: los menús de navegación, las instrucciones y los diccionarios de palabras que caen en las partidas se corresponden con su lengua materna. En español, las palabras son listas propias de Kidux, bien escritas, con eñe y con tilde.
+El juego está adaptado al idioma preferido del niño: los menús de navegación, las instrucciones y los diccionarios de palabras que caen en las partidas se corresponden con su lengua materna. En español y en francés, las palabras son listas propias de Kidux, bien escritas, con eñe o con sus acentos.
 
 ![Tux Typing](../../images/es/module-tuxtype.png)
 
@@ -25,11 +25,11 @@ El juego está adaptado al idioma preferido del niño: los menús de navegación
 - **Cometas**: reto donde caen meteoritos con palabras completas que deben teclearse antes del impacto.
 - **Lecciones**: el curso de mecanografía de Kidux, que se describe a continuación.
 
-Antes de jugar, el niño elige una lista de palabras. En español hay siete: **Palabras cortas**, **Animales**, **Comida**, **En casa**, **La naturaleza**, **Con eñe** y **Con tilde**. Todas son palabras que un niño conoce. La eñe aparece en todas las listas que la necesitan, y las tildes solo en la última, igual que en el curso, donde llegan al final.
+Antes de jugar, el niño elige una lista de palabras. En español hay siete: **Palabras cortas**, **Animales**, **Comida**, **En casa**, **La naturaleza**, **Con eñe** y **Con tilde**. Todas son palabras que un niño conoce. La eñe aparece en todas las listas que la necesitan, y las tildes solo en la última, igual que en el curso, donde llegan al final. En francés también hay siete, las dos últimas con é, è y à, y con ç, ù y el acento circunflejo.
 
 ## Lecciones de mecanografía
 
-Kidux incorpora un curso propio, en el idioma del niño, que enseña a escribir con los diez dedos siguiendo el orden clásico de la mecanografía: primero la fila central (a s d f y j k l ñ), después la fila superior y por último la inferior, con la coma y el punto. En español son catorce lecciones: las dos últimas enseñan las vocales con tilde. En inglés son doce.
+Kidux incorpora un curso propio, en el idioma del niño, que enseña a escribir con los diez dedos siguiendo el orden clásico de la mecanografía: primero la fila central (a s d f y j k l ñ), después la fila superior y por último la inferior, con la coma y el punto. En español son catorce lecciones: las dos últimas enseñan las vocales con tilde. En inglés son doce. En francés son quince, sobre el teclado AZERTY (primero q s d f y j k l m): las tres últimas enseñan é y è, à, ç y ù, y el acento circunflejo.
 
 - **Elegir una lección**: en el menú principal, **Lecciones** muestra la lista, de «Lección 01 - a s d f» a «Lección 14 - í ó y ú», ocho en cada página; la flecha de abajo pasa a la siguiente. Se elige con el ratón o con las flechas e Intro.
 - **Recorrido de cada lección**: una primera página presenta las teclas nuevas (**Intro** para seguir); la segunda indica con qué dedo se pulsa cada una sobre un teclado dibujado; con la tecla **P** comienza la práctica de esas teclas y, al terminarla, una segunda práctica con palabras formadas solo por letras ya aprendidas. Al final, **Intro** vuelve al menú principal.

@@ -980,7 +980,9 @@ fall: a Spanish-speaking child catches Spanish words. It is for children
 from six to twelve. GCompris, which teaches the keyboard's letters first,
 is a good start before it. Its **Lessons** menu holds Kidux's typing
 course: twelve lessons that teach typing with all ten fingers, a row at a
-time, fourteen in Spanish, whose last two bring the accented vowels. In
+time, fourteen in Spanish, whose last two bring the accented vowels, and
+fifteen in French, on the AZERTY keyboard, whose last three bring its
+accented letters. In
 each practice, the drawn keyboard has only the keys being practised
 written on it.
 

@@ -1050,13 +1050,13 @@ Pour en savoir plus : [la page de GCompris](modules/gcompris.md).
 **Tux Typing** apprend à un enfant à taper au clavier. Des lettres et des
 mots tombent du ciel, et l'enfant attrape chacun en le tapant, un niveau
 plus difficile à chaque fois. Ses menus sont dans la langue de l'enfant, et
-les mots qui tombent aussi : un enfant hispanophone attrape des mots
-espagnols. Il est destiné aux enfants de six à douze ans. GCompris, qui
+les mots qui tombent aussi : un enfant francophone attrape des mots
+français. Il est destiné aux enfants de six à douze ans. GCompris, qui
 apprend d'abord les lettres du clavier, est un bon début avant lui. Son
-menu **Lessons** contient le cours de dactylographie de Kidux : douze
-leçons qui apprennent à taper avec les dix doigts, une rangée à la fois,
-quatorze en espagnol, dont les deux dernières apportent les voyelles
-accentuées. Dans chaque exercice, le clavier dessiné ne porte que les
+menu **Leçons** contient le cours de dactylographie de Kidux : en
+français, quinze leçons pour le clavier AZERTY, qui apprennent à taper
+avec les dix doigts, une rangée à la fois, et dont les trois dernières
+apportent les lettres accentuées. Dans chaque exercice, le clavier dessiné ne porte que les
 touches qu'on est en train de travailler.
 
 Tux Typing garde ses scores et ses réglages pour lui, pas dans les dossiers

@@ -1,0 +1,138 @@
+# Kidux's typing lessons for Tux Typing, in French, on the AZERTY keyboard
+# (lessons/build.py, D112). One lesson a [[lesson]]: the keys it brings, and
+# the name its file shows when they are not plain letters; the lines that
+# place the fingers; a drill of those keys, and a line made only of keys
+# already learnt. AZERTY's home row has no vowel, so the first two lessons'
+# second line is a mix of those keys, not words; from the third, it is
+# words. Every line fits Tux Typing's screen and every practice one line of
+# it, which the build checks.
+
+language = "fr"
+locale = "fr_FR.UTF-8"
+# No base theme: Tux Typing's French theme has no pictures of its own, and
+# its words are written without their accents. Its default pictures, with
+# Kidux's own word lists, in word_lists, and Kidux's keyboard table.
+base = ""
+keyboard = "keyboard-fr.lst"
+word_lists = "words-fr"
+file = "Leçon {number:02d} - {name}"
+
+[words]
+title = "Leçon {number} : {keys}"
+start = "Appuie sur Entrée pour commencer"
+practise = "Appuie sur P pour t'entraîner"
+now_words = "Maintenant, avec ce que tu sais."
+well_done = "Bravo !"
+next = "Continue avec la leçon {next}."
+last = "Tu as fini toutes les leçons."
+back = "Appuie sur Entrée pour revenir"
+
+[[lesson]]
+keys = "q s d f"
+intro = ["Pose les doigts de la main gauche", "sur q, s, d et f."]
+fingers = ["Auriculaire sur le q, annulaire sur le s,", "majeur sur le d et index sur le f."]
+drill = "qsdf fdsq qs df sq fd"
+words = "fds sdf qsd dfq fdsq"
+
+[[lesson]]
+keys = "j k l m"
+intro = ["Pose les doigts de la main droite", "sur j, k, l et m."]
+fingers = ["Index sur le j, majeur sur le k,", "annulaire sur le l et auriculaire sur le m."]
+drill = "jklm mlkj jk lm kj ml"
+words = "qs lm df jk fdsq jklm"
+
+[[lesson]]
+keys = "e i"
+intro = ["Les majeurs montent d'une rangée :", "le gauche sur le e, le droit sur le i."]
+fingers = ["Le e avec le majeur gauche,", "le i avec le majeur droit."]
+drill = "ded kik de ki ei ie dei"
+words = "midi lime ski sel elle"
+
+[[lesson]]
+keys = "g h"
+intro = ["Les index s'étirent vers le milieu :", "le gauche sur le g, le droit sur le h."]
+fingers = ["Reviens toujours sur le f et le j", "après chaque lettre."]
+drill = "fgf jhj gh hg fgh jhg"
+words = "glisse gel sigle elfe"
+
+[[lesson]]
+keys = "r u"
+intro = ["Les index montent d'une rangée :", "le gauche sur le r, le droit sur le u."]
+fingers = ["Le r avec l'index gauche,", "le u avec l'index droit."]
+drill = "frf juj fr ju ru ur fru"
+words = "rue mur sur dure ruse frise"
+
+[[lesson]]
+keys = "t y"
+intro = ["Les index montent et s'étirent :", "le gauche sur le t, le droit sur le y."]
+fingers = ["Le t avec l'index gauche,", "le y avec l'index droit."]
+drill = "ftf jyj ft jy ty yt fty"
+words = "tu lit huit style tisser"
+
+[[lesson]]
+keys = "z o"
+intro = ["Les annulaires montent d'une rangée :", "le gauche sur le z, le droit sur le o."]
+fingers = ["Le z avec l'annulaire gauche,", "le o avec l'annulaire droit."]
+drill = "szs lol sz lo zo oz szo"
+words = "zoo rose mot gros lotus"
+
+[[lesson]]
+keys = "a p"
+intro = ["Les auriculaires montent d'une rangée :", "le gauche sur le a, le droit sur le p."]
+fingers = ["Le a avec l'auriculaire gauche,", "le p avec l'auriculaire droit."]
+drill = "qaq mpm qa mp ap pa qap"
+words = "papa pomme tapis plage"
+
+[[lesson]]
+keys = "v ,"
+name = "v et virgule"
+intro = ["Les index descendent d'une rangée :", "le gauche sur le v, le droit sur la virgule."]
+fingers = ["Le v avec l'index gauche,", "la virgule avec l'index droit."]
+drill = "fvf j,j fv j, v, ,v fvj,"
+words = "vase, vive, ville, olive"
+
+[[lesson]]
+keys = "b n"
+intro = ["Les index descendent et s'étirent :", "le gauche sur le b, le droit sur le n."]
+fingers = ["Le b avec l'index gauche,", "le n avec l'index droit."]
+drill = "fbf jnj fb jn bn nb fbn"
+words = "bonne banane bain nuit"
+
+[[lesson]]
+keys = "c ."
+name = "c et point"
+intro = ["Le majeur gauche descend sur le c.", "Le point est en bas à droite, sous le k :", "Maj, et la touche du point-virgule."]
+fingers = ["Le c avec le majeur gauche,", "le point avec le majeur droit."]
+drill = "dcd k.k dc k. c. .c dck."
+words = "car. sac. lac. avec. cerise."
+
+[[lesson]]
+keys = "x w"
+intro = ["En bas à gauche, le x et le w :", "l'annulaire descend sur le x,", "l'auriculaire sur le w."]
+fingers = ["Le x avec l'annulaire gauche,", "le w avec l'auriculaire gauche."]
+drill = "sxs qwq sx qw xw wx sxw"
+words = "wagon taxi kiwi boxe"
+
+[[lesson]]
+keys = "é è"
+name = "é et è"
+intro = ["é et è ont leur touche à elles,", "sur la rangée des chiffres :", "é sur le 2, è sur le 7."]
+fingers = ["Le é avec l'annulaire gauche,", "le è avec l'index droit."]
+drill = "sés jèj é è éè èé eé eè"
+words = "été élève père fée café"
+
+[[lesson]]
+keys = "à ç ù"
+name = "à ç et ù"
+intro = ["à est sur le 0, ç sur le 9,", "et ù à droite du m."]
+fingers = ["Le à et le ù avec l'auriculaire droit,", "le ç avec l'annulaire droit."]
+drill = "màm lçl mùm à ç ù àçù"
+words = "à ça où voilà garçon leçon"
+
+[[lesson]]
+keys = "ê î ô"
+name = "accent circonflexe"
+intro = ["L'accent circonflexe se tape avant :", "d'abord la touche ^ à droite du p,", "puis la voyelle."]
+fingers = ["La touche ^ avec l'auriculaire droit ;", "ê, î et ô avec les doigts de e, i et o."]
+drill = "eê iî oô ê î ô êîô ôîê"
+words = "fête forêt île hôtel tête"
