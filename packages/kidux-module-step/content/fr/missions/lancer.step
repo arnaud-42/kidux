@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE StepCoreXML>
+<world xmlns="http://edu.kde.org/step/StepCoreXML" version="1.0" id="1">
+    <name>world1</name>
+    <color>#ffffffff</color>
+    <time>0</time>
+    <timeScale>1</timeScale>
+    <errorsCalculation>false</errorsCalculation>
+
+    <item class="Particle" id="2">
+        <name>ball</name>
+        <color>#ffe4572e</color>
+        <position>(-4,0)</position>
+        <velocity>(4,6)</velocity>
+        <mass>1</mass>
+    </item>
+
+    <item class="WeightForce" id="3">
+        <name>weightForce1</name>
+        <color>#ff000000</color>
+        <weightConst>9.80665</weightConst>
+        <weightConstVariance>1e-10</weightConstVariance>
+    </item>
+
+    <item class="Tracer" id="4">
+        <name>tracer1</name>
+        <color>#ff3a86ff</color>
+        <body>2</body>
+        <localPosition>(0,0)</localPosition>
+        <points></points>
+    </item>
+
+    <item class="Note" id="5">
+        <name>note1</name>
+        <color>#ff3b2f2a</color>
+        <position>(-4,4)</position>
+        <size>(220,70)</size>
+        <text>&lt;html&gt;&lt;body&gt;&lt;p&gt;Appuie sur Simuler et regarde le trajet. Puis essaie la vitesse (6, 4). Laquelle va le plus loin ?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text>
+    </item>
+
+    <solver class="AdaptiveEulerSolver" id="6">
+        <name>solver1</name>
+        <stepSize>1</stepSize>
+        <toleranceAbs>0.001</toleranceAbs>
+        <toleranceRel>0.001</toleranceRel>
+    </solver>
+
+    <collisionSolver class="GJKCollisionSolver" id="7">
+        <name>collisionSolver1</name>
+        <toleranceAbs>0.001</toleranceAbs>
+    </collisionSolver>
+
+    <constraintSolver class="CGConstraintSolver" id="8">
+        <name>constraintSolver1</name>
+    </constraintSolver>
+
+</world>

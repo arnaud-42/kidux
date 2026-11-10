@@ -55,7 +55,8 @@ def test_the_page_holds_every_language_and_its_words(tmp_path):
 
     html = output.read_text()
     data = json.loads(html.split("const PAGES = ", 1)[1].split(";\n", 1)[0])
-    assert set(data) == {"en", "es"}
+    assert set(data) == {entry.name for entry in (PACKAGE / "content").iterdir() if entry.is_dir()}
+    assert data["fr"]["heading"].startswith("Bonjour")
     assert data["es"]["heading"] == "¡Hola!" and data["en"]["heading"] == "Hello!"
     assert len(data["es"]["paragraphs"]) == 3
     assert data["es"]["words"]["done"] == "Hecho"

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE StepCoreXML>
+<world xmlns="http://edu.kde.org/step/StepCoreXML" version="1.0" id="1">
+    <name>world1</name>
+    <color>#ffffffff</color>
+    <time>0</time>
+    <timeScale>1</timeScale>
+    <errorsCalculation>false</errorsCalculation>
+
+    <item class="Particle" id="2">
+        <name>ball</name>
+        <color>#ffe4572e</color>
+        <position>(1.5,0)</position>
+        <velocity>(0,0)</velocity>
+        <mass>1</mass>
+    </item>
+
+    <item class="Stick" id="3">
+        <name>rod</name>
+        <color>#ff3b2f2a</color>
+        <restLength>1.5</restLength>
+        <body1>0</body1>
+        <body2>2</body2>
+        <localPosition1>(0,0)</localPosition1>
+        <localPosition2>(0,0)</localPosition2>
+    </item>
+
+    <item class="WeightForce" id="4">
+        <name>weightForce1</name>
+        <color>#ff000000</color>
+        <weightConst>9.80665</weightConst>
+        <weightConstVariance>1e-10</weightConstVariance>
+    </item>
+
+    <item class="Note" id="5">
+        <name>note1</name>
+        <color>#ff3b2f2a</color>
+        <position>(-3,2.5)</position>
+        <size>(220,80)</size>
+        <text>&lt;html&gt;&lt;body&gt;&lt;p&gt;Appuie sur Simuler. Puis arrête, descends la balle, et appuie de nouveau : se balance-t-elle plus lentement ?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</text>
+    </item>
+
+    <solver class="AdaptiveEulerSolver" id="6">
+        <name>solver1</name>
+        <stepSize>1</stepSize>
+        <toleranceAbs>0.001</toleranceAbs>
+        <toleranceRel>0.001</toleranceRel>
+    </solver>
+
+    <collisionSolver class="GJKCollisionSolver" id="7">
+        <name>collisionSolver1</name>
+        <toleranceAbs>0.001</toleranceAbs>
+    </collisionSolver>
+
+    <constraintSolver class="CGConstraintSolver" id="8">
+        <name>constraintSolver1</name>
+    </constraintSolver>
+
+</world>

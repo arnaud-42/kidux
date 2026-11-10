@@ -66,7 +66,8 @@ def test_the_page_is_the_childs_language_or_english():
     heading, paragraphs = hello.page("es", content)
     assert heading == "¡Hola!"
     assert len(paragraphs) == 3 and "source_sha256" not in " ".join(paragraphs)
-    assert hello.page("fr", content) == hello.page("en", content)
+    assert hello.page("fr", content)[0].startswith("Bonjour")
+    assert hello.page("de", content) == hello.page("en", content)
     assert hello.page("en", content)[0] == "Hello!"
 
 
