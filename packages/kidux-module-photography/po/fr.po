@@ -41,7 +41,7 @@ msgstr "Essaie"
 
 #, python-brace-format
 msgid "On the {camera}"
-msgstr "Sur le {camera}"
+msgstr "Sur l'appareil {camera}"
 
 msgid ""
 "Other cameras have the same thing under other names; chapter 3 says how to "
