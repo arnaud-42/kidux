@@ -75,7 +75,7 @@ def test_the_page_holds_every_language_its_words_and_its_chapters(tmp_path):
 
     html = output.read_text()
     data = json.loads(html.split("const PAGES = ", 1)[1].split(";\n", 1)[0])
-    assert set(data) == {"en", "es"}
+    assert set(data) == {entry.name for entry in CONTENT.iterdir() if entry.is_dir()}
     assert data["es"]["words"]["next"] == "Siguiente" and data["en"]["words"]["next"] == "Next"
     assert data["es"]["words"]["title"] == "Fotografía"
     assert len(data["es"]["chapters"]) == len(data["en"]["chapters"]) >= 1
@@ -174,7 +174,7 @@ def test_a_chapter_has_its_box_for_the_adult_and_its_camera_box_names_the_manual
     text = chapter.read_text()
     assert "::: adult\n" in text
     for box in re.findall(r"^::: camera\n(.*?)\n:::$", text, re.M | re.S):
-        assert re.search(r"\((?:manual|manual de la cámara), p(?:p)?\. \d+", box), chapter.name
+        assert re.search(r"\((?:manual|manual de la cámara|manuel), p(?:p)?\. \d+", box), chapter.name
 
 
 @pytest.mark.parametrize("chapter", chapters(), ids=lambda path: f"{path.parent.name}/{path.stem}")
